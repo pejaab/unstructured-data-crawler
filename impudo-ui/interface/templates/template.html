@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block header_text %}Crawler: {{ item.url_abbr }}{% endblock %}
+{% block table %}
+<form method='POST' action={% url 'view_template' item.id %}> 
+    <table id='id_template_table' class='table'>
+      <tr>
+        <td>
+        </td>
+        <td>Your input</td>
+        <td>Crawler output</td>
+      <tr>
+        <td>Scraping Depth</td>
+        <td>
+          {{ form.url }}
+        </td>
+        <td>{{ item.url }}</td>
+      </tr>
+      <tr>
+        <td>Descriptional content</td>
+        <td>
+          {{ form.desc }}
+        </td>
+        <td>{{ item.desc }}</td>
+      </tr>
+      <tr><td><input id='id_submit' type='submit' value='Change crawler template'></td></tr>
+    </table>
+    {% csrf_token %}
+    {% if form.errors %}
+      <div class='form-group has-error'>
+        <span class='help-block'>{{ form.url.errors }}</span>
+        <span class='help-block'>{{ form.desc.errors }}</span>
+      </div>
+    {% endif %}
+  </form>
+{% endblock %}
