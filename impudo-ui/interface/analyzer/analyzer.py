@@ -22,10 +22,10 @@ class Analyzer(object) :
    def search_content(self, url, path):
        elem_tree = lh.parse(url)
        result = elem_tree.xpath(path)[0]
-       result_html = tostring(result)
+       result_html = tostring(result).decode('utf-8')
        return result_html
     
-   '''
+   
    @staticmethod
    def find_path() :
        html_file = "ETOZGianfranco.html"
@@ -53,7 +53,7 @@ class Analyzer(object) :
        #Insert record
        dao.insert_record('TestUrl', result_html, 19)
        dao.insert_record('TestUrl', result2_html, 19)
-   '''
-#Analyzer.find_path()
-#path = Analyzer.search_path('http://www.etoz.ch/kyoto/', 'Gianfranco Frattini')
-#Analyzer.search_content('http://www.etoz.ch/ospite/', path)
+   
+Analyzer.find_path()
+path = Analyzer.search_path('http://www.etoz.ch/kyoto/', 'Gianfranco Frattini')
+Analyzer.search_content('http://www.etoz.ch/ospite/', path)
