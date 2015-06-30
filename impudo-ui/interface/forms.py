@@ -78,9 +78,10 @@ class TemplateForm(forms.models.ModelForm):
         #print(paths)
         #print(results)
         crawler, created = Crawler.objects.get_or_create(
-                template=self.instance.pk, defaults={'paths':';'.join(paths), 'results':';'.join(results)}
+                template=self.instance.pk, defaults={'paths':';'.join(paths), 'results':';'.join(results), 'url': url,}
                 )
         if not created:
             crawler.paths = ';'.join(paths)
             crawler.results = ';'.join(results)
+            crawler.url = url
             crawler.save()
