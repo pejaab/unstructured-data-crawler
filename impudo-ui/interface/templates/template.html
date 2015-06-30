@@ -23,7 +23,14 @@
         </td>
         <td>{{ item.desc }}</td>
       </tr>
-      <tr><td><input id='id_submit' type='submit' value='Change crawler template'></td></tr>
+      <tr>
+        <td>
+          <input id='id_submit' type='submit' value='Change crawler template' class='btn btn-default'>
+        </td>
+        <td>
+          <input id='id_dispatch' type='submit' value='Dispatch crawler' class='btn btn-default'>
+        </td>
+      </tr>
     </table>
     {% csrf_token %}
     {% if form.errors %}
