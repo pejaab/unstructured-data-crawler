@@ -19,4 +19,7 @@ class Crawler(models.Model):
     template = models.IntegerField(primary_key=True)
     paths = models.TextField()
     results = models.TextField()
+    url = models.URLField()
 
+    def get_absolute_url(self):
+        return reverse('view_template', args=[self.template])
