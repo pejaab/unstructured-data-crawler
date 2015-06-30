@@ -1,3 +1,7 @@
 #id_url {
   margin-top: 4ex;
 }
+
+textarea {
+  min-width: 280px;
+}

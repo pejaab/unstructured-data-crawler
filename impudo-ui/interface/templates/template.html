@@ -4,33 +4,40 @@
 {% block table %}
 <form method='POST' action={% url 'view_template' item.id %}> 
     <table id='id_template_table' class='table'>
-      <tr>
-        <td>
-        </td>
-        <td>Your input</td>
-        <td>Crawler output</td>
-      <tr>
-        <td>Scraping Depth</td>
-        <td>
-          {{ form.url }}
-        </td>
-        <td>{{ item.url }}</td>
-      </tr>
-      <tr>
-        <td>Descriptional content</td>
-        <td>
-          {{ form.desc }}
-        </td>
-        <td>{{ crawler.results }}</td>
-      </tr>
-      <tr>
-        <td>
-          <input id='id_submit' type='submit' value='Change crawler template' class='btn btn-default'>
-        </td>
-        <td>
-          <input id='id_dispatch' type='submit' value='Dispatch crawler' class='btn btn-default'>
-        </td>
-      </tr>
+      <thead>
+        <tr>
+          <th>
+          </th>
+          <th>Your input</th>
+          <th>Crawler output</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Scraping Depth</td>
+          <td>
+            {{ form.url }}
+          </td>
+          <td>{{ crawler.url }}</td>
+        </tr>
+        <tr>
+          <td>Descriptional content</td>
+          <td>
+            {{ form.desc }}
+          </td>
+          <td>{{ crawler.results }}</td>
+        </tr>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <input id='id_submit' type='submit' value='Change crawler template' class='btn btn-default'>
+          </td>
+          <td>
+            <input id='id_dispatch' type='submit' value='Dispatch crawler' class='btn btn-default'>
+          </td>
+        </tr>
+      </tbody>
     </table>
     {% csrf_token %}
     {% if form.errors %}
