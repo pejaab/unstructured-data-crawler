@@ -53,7 +53,8 @@ class Analyzer(object) :
        #Insert record
        dao.insert_record('TestUrl', result_html, 19)
        dao.insert_record('TestUrl', result2_html, 19)
-   
-Analyzer.find_path()
-path = Analyzer.search_path('http://www.etoz.ch/kyoto/', 'Gianfranco Frattini')
-Analyzer.search_content('http://www.etoz.ch/ospite/', path)
+
+if __name__ == '__main__':   
+    Analyzer.find_path()
+    path = Analyzer.search_path('http://www.etoz.ch/kyoto/', 'Gianfranco Frattini')
+    Analyzer.search_content('http://www.etoz.ch/ospite/', path)
