@@ -28,6 +28,9 @@ class TemplateItemForm(forms.models.ModelForm):
                 }
     
     def save(self):
+        '''
+        Saves the missing url_abbr field by pattern matching.
+        '''
         url = self['url'].value() 
         match = re.search(r'^(http://www.|http://)(.*)\.', url)
         url_abbr = match.group(2) if match else url

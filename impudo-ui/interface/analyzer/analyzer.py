@@ -1,6 +1,6 @@
 import lxml.html as lh
 from lxml.etree import tostring
-from dao import Dao
+#from dao import Dao
 
 class Analyzer(object) :
 
@@ -24,7 +24,8 @@ class Analyzer(object) :
        result = elem_tree.xpath(path)[0]
        result_html = tostring(result)
        return result_html
-
+    
+   '''
    @staticmethod
    def find_path() :
        html_file = "ETOZGianfranco.html"
@@ -39,7 +40,7 @@ class Analyzer(object) :
        result = elem_tree.xpath(path)[0]
        result_html = tostring(result)
        result_class = result.attrib.get('class')
-       print '{0} -> {1}'.format(input_string, elem_tree.getpath(node))
+       print('{0} -> {1}'.format(input_string, elem_tree.getpath(node)))
        #Use template
        html_file2 = "ETOZCocktail.html"
        elem_tree2 = lh.parse(html_file2)
@@ -52,7 +53,7 @@ class Analyzer(object) :
        #Insert record
        dao.insert_record('TestUrl', result_html, 19)
        dao.insert_record('TestUrl', result2_html, 19)
-
-Analyzer.find_path()
-path = Analyzer.search_path('http://www.etoz.ch/kyoto/', 'Gianfranco Frattini')
-Analyzer.search_content('http://www.etoz.ch/ospite/', path)
+   '''
+#Analyzer.find_path()
+#path = Analyzer.search_path('http://www.etoz.ch/kyoto/', 'Gianfranco Frattini')
+#Analyzer.search_content('http://www.etoz.ch/ospite/', path)
