@@ -1,4 +1,4 @@
-import MySQLdb
+import mysql.connector
 
 class Dao(object) :
 
@@ -12,11 +12,11 @@ class Dao(object) :
     _table_record = 'crawl_record'
 
     # def __init__(self):
-    #     self.conn = MySQLdb.connect(user='root', passwd='idp2015', host='46.38.236.133', db='impudo')
+    #     self.conn = mysql.connector.connect(user='root', passwd='idp2015', host='46.38.236.133', database='impudo')
     #     self.cursor = self.conn.cursor()
 
-    def __init__(self, user=_user, passwd=_passwd, host=_host, db=_db):
-        self.conn = MySQLdb.connect(user=user, passwd=passwd, host=host, db=db)
+    def __init__(self, user=_user, passwd=_passwd, host=_host, databaseb=_db):
+        self.conn = mysql.connector.connect(user=user, passwd=passwd, host=host, database=db)
         self.cursor = self.conn.cursor()
 
     def get_template(self):
@@ -36,13 +36,13 @@ class Dao(object) :
         try:
             self.cursor.execute(sql)
             self.conn.commit()
-        except MySQLdb.Error, e:
+        except mysql.connector.Error as e:
             self.conn.rollback()
-            print "Error %d: %s" % (e.args[0], e.args[1])
+            print("Error %d: %s" % (e.args[0], e.args[1]))
 
     def query_sql(self, sql):
         try:
             self.cursor.execute(sql)
             return self.cursor.fetchone()
-        except MySQLdb.Error, e:
-            print "Error %d: %s" % (e.args[0], e.args[1])
+        except mysql.connector.Error as e:
+            print("Error %d: %s" % (e.args[0], e.args[1]))
