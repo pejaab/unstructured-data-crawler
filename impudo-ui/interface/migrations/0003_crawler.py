@@ -14,9 +14,13 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Crawler',
             fields=[
-                ('template', models.IntegerField(serialize=False, primary_key=True)),
-                ('paths', models.TextField()),
-                ('result', models.TextField()),
+                ('id', models.AutoField(primary_key=True, serialize=False)),
+                ('template', models.IntegerField()),
+                ('xpath', models.TextField()),
+                ('content', models.TextField()),
+                ('url', models.URLField()),
+                ('active', models.BooleanField(default=False)),
+                ('crawled', models.CharField(max_length=20, default='False')),
             ],
         ),
     ]

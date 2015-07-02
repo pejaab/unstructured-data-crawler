@@ -16,10 +16,12 @@ class Template(models.Model):
 
 
 class Crawler(models.Model):
-    template = models.IntegerField(primary_key=True)
-    paths = models.TextField()
-    results = models.TextField()
+    template = models.ForeignKey(Template, default=None)
+    xpath = models.TextField()
+    content = models.TextField()
     url = models.URLField()
+    active = models.BooleanField(default=False)
+    crawled = models.CharField(max_length=20, default='False')
 
     def get_absolute_url(self):
         return reverse('view_template', args=[self.template])

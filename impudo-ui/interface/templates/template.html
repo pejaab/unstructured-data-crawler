@@ -18,14 +18,14 @@
           <td>
             {{ form.url }}
           </td>
-          <td>{{ crawler.url }}</td>
+          <td>{{ item.url }}</td>
         </tr>
         <tr>
           <td>Descriptional content</td>
           <td>
             {{ form.desc }}
           </td>
-          <td>{{ crawler.results }}</td>
+          <td>{{ item.crawler_set.all }}</td>
         </tr>
         <tr>
           <td>

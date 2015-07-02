@@ -55,13 +55,13 @@ class TemplateForm(forms.models.ModelForm):
         
         #TODO: try and except catch of indexerror in analyzer???
         paths = []
-        results = []
+        results = {}
         for line in split_on_eof(desc):
             try:
                 path = analyzer.search_path(url, line)
                 if not path in paths:
                     paths.append(path)
-                    results.append(analyzer.search_content(url, path))
+                    results[path] = analyzer.search_content(url, path)
             except IndexError as e:
                 print('Error: %s' %(e,))
                 '''
@@ -74,9 +74,10 @@ class TemplateForm(forms.models.ModelForm):
                     except IndexError as e:
                         print('Error: %s' %(e,))
                 '''
-        #print(self.instance.pk)
-        #print(paths)
-        #print(results)
+        '''
+        print(self.instance.pk)
+        print(paths)
+        print(results)
         crawler, created = Crawler.objects.get_or_create(
                 template=self.instance.pk, defaults={'paths':';'.join(paths), 'results':';'.join(results), 'url': url,}
                 )
@@ -85,3 +86,6 @@ class TemplateForm(forms.models.ModelForm):
             crawler.results = ';'.join(results)
             crawler.url = url
             crawler.save()
+        '''
+        for path, content in results.items():
+            Crawler.objects.create(template= self.instance, xpath= path, content= content, url= url)
