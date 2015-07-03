@@ -25,16 +25,20 @@
           <td>
             {{ form.desc }}
           </td>
-          <td>{{ item.crawler_set.all }}</td>
+          <td>
+              {% for record in item.crawler_set.all %}
+              <input type='checkbox' name='record' value={{ record.id }}>{{ record.content }}<br>
+              {% endfor %}
+          </td>
         </tr>
         <tr>
           <td>
           </td>
           <td>
-            <input id='id_submit' type='submit' value='Change crawler template' class='btn btn-default'>
+            <input id='id_submit' type='submit' name='change' value='Change crawler template' class='btn btn-default'>
           </td>
           <td>
-            <input id='id_dispatch' type='submit' value='Dispatch crawler' class='btn btn-default'>
+            <input id='id_dispatch' type='submit' name='dispatch' value='Dispatch crawler' class='btn btn-default'>
           </td>
         </tr>
       </tbody>

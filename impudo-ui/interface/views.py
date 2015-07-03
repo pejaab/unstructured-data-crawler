@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
 from interface.forms import TemplateForm
-from interface.models import Template
+from interface.models import Template, Crawler
 
 def home_page(request):
     return render(request, 'home.html', {'form': TemplateForm()})
@@ -13,7 +13,21 @@ def view_template(request, template_id):
     form = TemplateForm()
     if request.method == 'POST':
         form = TemplateForm(data=request.POST, instance=item)
-        if form.is_valid():
+        if form.is_valid(): 
+            print(request.POST)
+            if 'dispatch' in request.POST:
+                #TODO: start crawler & redirect to manage page
+                if not 'record' in request.POST:
+                    #TODO: error that no xpath was selected and return to same page content
+                    pass
+                for record_id in request.POST.getlist('record'):
+                    record = Crawler.objects.get(id=int(record_id))
+                    record.active = 1
+                    record.save()
+                    #TODO: return to manage page
+                    return render(request, 'home.html', {'form': TemplateForm()})
+            # Delete xpath records before re-searching them
+            Crawler.objects.filter(template_id=template_id).delete()
             item = form.save()
             form.analyze()
             return redirect(item)  
