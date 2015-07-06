@@ -26,7 +26,7 @@ def view_template(request, template_id):
                     record.active = 1
                     record.save()
                 #TODO: return to manage page
-                # Only active records are saved
+                # Only active records are kept in database 
                 Crawler.objects.filter(template_id=template_id, active=0).delete() 
                 return render(request, 'home.html', {'form': TemplateForm()})
             # Delete xpath records before re-searching them

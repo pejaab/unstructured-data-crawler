@@ -17,9 +17,11 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from interface import urls as template_urls
 from interface import views
+from interface.admin import admin_site
 
 urlpatterns = [
     url(r'^$', views.home_page, name='home'),
     url(r'^templates/', include(template_urls)),
-    url(r'^manage/', include(admin.site.urls)),
+    #url(r'^manage/', include(admin.site.urls)),
+    url(r'^manage/', include(admin_site.urls)),
 ]

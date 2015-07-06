@@ -3,8 +3,12 @@ from django.contrib.auth.models import Group, User
 
 from interface.models import Template, Crawler
 
-admin.site.unregister(User)
-admin.site.unregister(Group)
+#admin.site.unregister(User)
+#admin.site.unregister(Group)
+
+class AdminSite(admin.AdminSite):
+    site_header = 'Impudo Manage Crawler'
+    site_title = 'Impudo Manage Templates and Scrapings'
 
 class CrawlerInline(admin.TabularInline):
     model = Crawler
@@ -28,5 +32,7 @@ class TemplateAdmin(admin.ModelAdmin):
 #    def has_add_permission(self, request):
 #        return False
 
-admin.site.register(Template, TemplateAdmin)
+admin_site = AdminSite(name='admin')
+admin_site.register(Template, TemplateAdmin)
+#admin.site.register(Template, TemplateAdmin)
 #admin.site.register(Crawler, CrawlerAdmin)
