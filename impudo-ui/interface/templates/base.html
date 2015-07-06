@@ -22,8 +22,8 @@
                 <span class="icon-bar"></span>
               </button>
 
-              <a class="navbar-brand" href="{% url 'admin:index' %}">Manage Crawler</a>
-              <a class="navbar-brand" href="{% url 'home' %}">Create Crawler</a>
+              <a class="navbar-brand" href="{% block manage_link %}{% endblock %}">Manage Crawler</a>
+              <a class="navbar-brand" href="{% block create_link %}{% endblock %}">Create Crawler</a>
             </div>
           </div>
         </div>

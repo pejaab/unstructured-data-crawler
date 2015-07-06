@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% block manage_link %}{% url 'admin:index' %}{% endblock %}
+{% block create_link %}{% url 'home' %}{% endblock %}
 {% block header_text %}Create Crawler Template{% endblock %}
 
 {% block input %}

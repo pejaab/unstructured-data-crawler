@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
-
+{% block manage_link %}#{% endblock %}
+{% block create_link %}#{% endblock %}
 {% block header_text %}Crawler: {{ item.url_abbr }}{% endblock %}
 {% block table %}
 <form method='POST' action={% url 'view_template' item.id %}> 
