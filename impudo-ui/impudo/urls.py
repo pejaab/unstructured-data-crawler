@@ -21,5 +21,5 @@ from interface import views
 urlpatterns = [
     url(r'^$', views.home_page, name='home'),
     url(r'^templates/', include(template_urls)),
-    #url(r'^admin/', include(admin.site.urls)),
+    url(r'^manage/', include(admin.site.urls)),
 ]
