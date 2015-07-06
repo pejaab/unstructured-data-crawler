@@ -7,8 +7,7 @@ from interface.models import Template, Crawler
 #admin.site.unregister(Group)
 
 class AdminSite(admin.AdminSite):
-    site_header = 'Impudo Manage Crawler'
-    site_title = 'Impudo Manage Templates and Scrapings'
+    site_header = 'Manage Crawler'
 
 class CrawlerInline(admin.TabularInline):
     model = Crawler
