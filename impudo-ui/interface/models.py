@@ -6,7 +6,7 @@ from interface.analyzer.analyzer import Analyzer
 class Template(models.Model):
     url_abbr = models.TextField(verbose_name='Name')
     url = models.URLField()
-    desc = models.TextField()
+    desc = models.TextField(verbose_name='Description')
     
     def __str__(self):
         return self.url_abbr
@@ -22,3 +22,6 @@ class Crawler(models.Model):
     url = models.URLField()
     active = models.BooleanField(default=False)
     crawled = models.CharField(max_length=20, default='False')
+
+    def __str__(self):
+        return str(self.pk)

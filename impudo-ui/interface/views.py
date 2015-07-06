@@ -19,13 +19,16 @@ def view_template(request, template_id):
                 #TODO: start crawler & redirect to manage page
                 if not 'record' in request.POST:
                     #TODO: error that no xpath was selected and return to same page content
-                    pass
+                    return render(request, 'template.html', {'form': form, 'item': item,})
+                # Activate selected records
                 for record_id in request.POST.getlist('record'):
                     record = Crawler.objects.get(id=int(record_id))
                     record.active = 1
                     record.save()
-                    #TODO: return to manage page
-                    return render(request, 'home.html', {'form': TemplateForm()})
+                #TODO: return to manage page
+                # Only active records are saved
+                Crawler.objects.filter(template_id=template_id, active=0).delete() 
+                return render(request, 'home.html', {'form': TemplateForm()})
             # Delete xpath records before re-searching them
             Crawler.objects.filter(template_id=template_id).delete()
             item = form.save()
