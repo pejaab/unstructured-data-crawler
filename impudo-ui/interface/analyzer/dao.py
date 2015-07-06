@@ -8,8 +8,8 @@ class Dao(object) :
     _host = '46.38.236.133'
     _db = 'impudo'
 
-    _table_template = 'interface_templateitem'
-    _table_record = 'crawl_record'
+    _table_template = 'interface_template'
+    _table_record = 'interface_crawler'
 
     # def __init__(self):
     #     self.conn = mysql.connector.connect(user='root', passwd='idp2015', host='46.38.236.133', database='impudo')
@@ -23,13 +23,13 @@ class Dao(object) :
         sql = 'SELECT id, url, desc from {0} limit 1'.format(self._table_template);
         return self.query_sql(sql)
 
-    def update_path(self, id, path):
-        sql = 'UPDATE {0} SET path="{1}" where id={2}'.format(self._table_template, path, id)
+    def update_path(self, id, xpath):
+        sql = 'UPDATE {0} SET xpath="{1}" where id={2}'.format(self._table_template, xpath, id)
         self.execute_sql(sql)
 
-    def insert_record(self, url, result, template_id):
-        result = result.replace('\'', '\'\'')
-        sql = "INSERT INTO {0} (url, result, template_id) VALUES ('{1}', '{2}', {3})".format(self._table_record, url, result, template_id)
+    def insert_record(self, template_id, xpath, content, url, active, crawled):
+        xpath = xpath.replace('\'', '\'\'')
+        sql = "INSERT INTO {0} (template_id, xpath, content, url, active, crawled) VALUES ('{1}', '{2}', {3})".format(self._table_record, template_id, xpath, content, url, active, crawled)
         self.execute_sql(sql)
 
     def execute_sql(self, sql):
