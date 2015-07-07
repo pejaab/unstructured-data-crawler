@@ -16,12 +16,6 @@
         <div class="navbar-inner">
           <div class="container">
             <div class="navbar-header">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-navbar-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-
               <a class="navbar-brand" href="{% block manage_link %}{% endblock %}">Manage Crawler</a>
               <a class="navbar-brand" href="{% block create_link %}{% endblock %}">Create Crawler</a>
             </div>
@@ -31,14 +25,18 @@
     <div class='row'>
       <div class='col-md-6 col-md-offset-3 jumbotron'>
         <div class='text-center'>
-          <h1>{% block header_text %}{% endblock %}</h1> 
+          <h1>{% block header_text %}{% endblock %}</h1>
+        </div>
+      </div>
+    </div>
+    <div class='row'>
+      <div class='col-md-6 col-md-offset-3'>
+        <div class='text-center'>
           {% block input %}
           {% endblock %}
         </div>
       </div>
     </div>
-
-    <div class='row'>
       <div class='col-md-6 col-md-offset-3'>
         {% block table %}
         {% endblock %}
