@@ -1,3 +1,7 @@
 __pycache__
 *.pyc
 *.swp
+base.html
+change_form.html
+interface/templates/base_site.html
+interface/templates/template_css.html

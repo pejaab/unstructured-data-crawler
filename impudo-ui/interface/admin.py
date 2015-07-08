@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group, User
 
-from interface.models import Template, Crawler
+from interface.models import Crawler, Record, Template
 
 #admin.site.unregister(User)
 #admin.site.unregister(Group)
@@ -33,5 +33,6 @@ class TemplateAdmin(admin.ModelAdmin):
 
 admin_site = AdminSite(name='admin')
 admin_site.register(Template, TemplateAdmin)
+admin_site.register(Record)
 #admin.site.register(Template, TemplateAdmin)
 #admin.site.register(Crawler, CrawlerAdmin)

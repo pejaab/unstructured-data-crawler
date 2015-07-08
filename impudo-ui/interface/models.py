@@ -25,3 +25,10 @@ class Crawler(models.Model):
 
     def __str__(self):
         return str(self.pk)
+
+class Record(models.Model):
+    template = models.ForeignKey(Template, default=None)
+    title = models.CharField(max_length=200, default=None)
+    url = models.URLField()
+    result = models.TextField()
+
