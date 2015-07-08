@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
-{% block manage_link %}#{% endblock %}
-{% block create_link %}#{% endblock %}
+{% block links %}
+  <a class="navbar-brand" href='#'>Manage Crawler</a> 
+  <a class="navbar-brand" href='#'>Create Crawler</a>
+{% endblock %}
 {% block header_text %}Crawler: {{ item.url_abbr }}{% endblock %}
 {% block table %}
 
