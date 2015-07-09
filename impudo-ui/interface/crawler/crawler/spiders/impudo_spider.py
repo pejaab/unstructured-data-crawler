@@ -9,7 +9,7 @@ from crawler.dao import Dao
 
 class ImpudoSpider(CrawlSpider):
 	"""docstring for ImpudoSpider"""
-	name = "etoz"
+	name = "impudo"
 	allowed_domains = ["etoz.ch"]
 	start_urls = ["http://www.etoz.ch"]
 
@@ -35,7 +35,13 @@ class ImpudoSpider(CrawlSpider):
 		
 		content = Analyzer.search_content(response.url,self.xpath)
 
-		self.dao.insert_record(response.url, content, self.templateid)
+		title = Analyzer.search_content(response.url, "/html/head/title")
+		url = response.url
+
+
+		#print title, response.url, content
+
+		self.dao.insert_record(title, response.url, content, self.templateid)
 
 		'''
 		item = Product()

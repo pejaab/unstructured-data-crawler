@@ -9,7 +9,7 @@ class Dao(object) :
     _db = 'impudo'
 
     _table_template = 'interface_templateitem'
-    _table_record = 'crawl_record'
+    _table_record = 'interface_record'
 
     # def __init__(self):
     #     self.conn = mysql.connector.connect(user='root', passwd='idp2015', host='46.38.236.133', database='impudo')
@@ -21,21 +21,23 @@ class Dao(object) :
 
     #get xpath for site
     def get_path(self, url):
-        sql = 'SELECT paths, template from interface_crawler where url like "%{0}%" limit 1'.format(url)
+        sql = 'SELECT xpath, template_id from interface_crawler where url like "%{0}%" and active=1 limit 1'.format(url)
         return self.query_sql(sql)
 
 
-    def get_template(self):
+    '''def get_template(self):
         sql = 'SELECT id, url, desc from {0} limit 1'.format(self._table_template);
         return self.query_sql(sql)
 
     def update_path(self, id, path):
         sql = 'UPDATE {0} SET path="{1}" where id={2}'.format(self._table_template, path, id)
-        self.execute_sql(sql)
+        self.execute_sql(sql) '''
 
-    def insert_record(self, url, result, template_id):
+    def insert_record(self, title, url, result, template_id):
         result = result.replace('\'', '\'\'')
-        sql = "INSERT INTO {0} (url, result, template_id) VALUES ('{1}', '{2}', {3})".format(self._table_record, url, result, template_id)
+        title = title.replace('\'', '\'\'')
+
+        sql = "INSERT INTO {0} (title, url, result, template_id) VALUES ('{1}', '{2}', '{3}',{4})".format(self._table_record, title, url, result, template_id)
         self.execute_sql(sql)
 
     def execute_sql(self, sql):
