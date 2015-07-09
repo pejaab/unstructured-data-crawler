@@ -21,12 +21,19 @@ class ImpudoSpider(CrawlSpider):
 		)
 
 
-	def __init__(self, *a, **kw):
-		super(ImpudoSpider, self).__init__(*a, **kw)
+	def __init__(self, domain= '', start_url=''):
+		super(ImpudoSpider, self).__init__()
 		self.dao = Dao()
 		result = self.dao.get_path(self.start_urls[0])
 		self.xpath = result[0]
 		self.templateid = result[1]
+
+		if start_url and domain:
+			start_urls=[]
+			start_urls.append(start_url)
+			allowed_domains=[]
+			allowed_domains.append(domain)
+
 	
 	#def parse(self, response):
 	#	pass
@@ -41,7 +48,7 @@ class ImpudoSpider(CrawlSpider):
 
 		#print title, response.url, content
 
-		self.dao.insert_record(title, response.url, content, self.templateid)
+		#self.dao.insert_record(title, response.url, content, self.templateid)
 
 		'''
 		item = Product()
