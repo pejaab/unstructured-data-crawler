@@ -25,7 +25,7 @@ class Dao(object) :
         return self.query_sql(sql)
 
     def get_rules(self, url):
-        sql = 'SELECT follow_rules, parse_rules, follow_rules_deny, parse_rules_deny from impudo_rules where domain like "%{0}%" limit 1'.format(url)
+        sql = 'SELECT follow_rules, parse_rules, follow_rules_deny, parse_rules_deny from impudo_rules where domain = "{0}" limit 1'.format(url)
         return self.query_sql(sql)
 
 
