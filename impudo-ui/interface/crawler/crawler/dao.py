@@ -24,6 +24,10 @@ class Dao(object) :
         sql = 'SELECT xpath, template_id from interface_crawler where url like "%{0}%" and active=1 limit 1'.format(url)
         return self.query_sql(sql)
 
+    def get_rules(self, url):
+        sql = 'SELECT follow_rules, parse_rules, follow_rules_deny, parse_rules_deny from impudo_rules where domain like "%{0}%" limit 1'.format(url)
+        return self.query_sql(sql)
+
 
     '''def get_template(self):
         sql = 'SELECT id, url, desc from {0} limit 1'.format(self._table_template);

@@ -13,20 +13,39 @@ class ImpudoSpider(CrawlSpider):
 	allowed_domains = ["etoz.ch"]
 	start_urls = ["http://www.etoz.ch"]
 
-	rules = (
+	'''rules = (
 
 		Rule(LinkExtractor(allow=('/collection/','/tag/')), follow=True),
 		Rule(LinkExtractor(allow=('/.+/'), deny=('/tag/', '/designers/')), callback='parse_product'),
 
 		)
+	'''
 
 
 	def __init__(self, domain= '', start_url=''):
-		super(ImpudoSpider, self).__init__()
 		self.dao = Dao()
+
+		#get and set rules for specific domain
+		textrules = self.dao.get_rules(self.allowed_domains[0])
+		
+		follows = tuple(textrules[0].split(','))
+		parses = tuple(textrules[1].split(','))
+		follow_denies = tuple(textrules[2].split(','))
+		parse_denies = tuple(textrules[3].split(','))
+
+		ImpudoSpider.rules = (
+			Rule(LinkExtractor(allow=follows, deny=follow_denies), follow=True),
+			Rule(LinkExtractor(allow=parses, deny=parse_denies), callback='parse_product'),
+
+		)
+
+		super(ImpudoSpider, self).__init__()
+		
+		#get xpath
 		result = self.dao.get_path(self.start_urls[0])
 		self.xpath = result[0]
 		self.templateid = result[1]
+
 
 		if start_url and domain:
 			start_urls=[]
@@ -46,7 +65,7 @@ class ImpudoSpider(CrawlSpider):
 		url = response.url
 
 
-		#print title, response.url, content
+		print title, response.url, content
 
 		#self.dao.insert_record(title, response.url, content, self.templateid)
 
