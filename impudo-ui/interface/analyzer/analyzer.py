@@ -1,12 +1,23 @@
-import lxml.html as lh
-from lxml.etree import tostring
+import lxml.html
+from lxml import etree
+import html as html_tools
+import re
+import difflib
+import requests
 
 class Analyzer(object) :
+
+    html_block_elements = {
+        "article", "blockquote", "dd", "div", "dl", "fieldset", "figcaption",
+        "figure", "footer", "form", "h1", "h2", "h3", "h4", "h5", "h6", "header",
+        "hgroup", "hr", "li", "noscript", "ol", "output", "p", "pre", "section", "table",
+        "tr", "th", "td", "tfoot", "thead", "ul", "br",
+        }
 
     def __init__(self, url):
         self.r = requests.get(url)
         try:
-            r.raise_for_status()
+            self.r.raise_for_status()
         except requests.HTTPError as e:
             pass
         self.elem_tree = lxml.html.parse(url)
@@ -14,12 +25,12 @@ class Analyzer(object) :
     def _html_text_recursive(self, e):
         if e.tag in ["script", "style"] or not isinstance(e.tag, str):
             return
-        if e.tag in HTML_BLOCK_ELEMENTS: yield "\n"
+        if e.tag in self.html_block_elements: yield "\n"
         #if e.tag == "li": yield "• "
         yield e.text
         for c in e.iterchildren():
             yield from self._html_text_recursive(c)
-        if e.tag in HTML_BLOCK_ELEMENTS: yield "\n"
+        if e.tag in self.html_block_elements: yield "\n"
         yield e.tail
 
 
@@ -37,12 +48,12 @@ class Analyzer(object) :
     def _html_text_recursive_search(self, e):
         if e.tag in ["script", "style"] or not isinstance(e.tag, str):
             return
-        if e.tag in HTML_BLOCK_ELEMENTS: yield (e, "\n")
+        if e.tag in self.html_block_elements: yield (e, "\n")
         #if e.tag == "li": yield "• "
         yield (e, e.text)
         for c in e.iterchildren():
             yield from self._html_text_recursive_search(c)
-        if e.tag in HTML_BLOCK_ELEMENTS: yield (e, "\n")
+        if e.tag in self.html_block_elements: yield (e, "\n")
         yield (e, e.tail)
 
 
@@ -120,7 +131,7 @@ class Analyzer(object) :
 
         return paths
     
-    def analyze(self, url, search_string):
+    def analyze(self,  search_string):
         text, text_map, root = self._html_to_text_search(self.r.text)
         search_string = re.sub("[ \t\n]+", " ", search_string)
         matches = self._find_text(text, search_string.lower())

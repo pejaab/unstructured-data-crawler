@@ -42,50 +42,8 @@ class TemplateForm(forms.models.ModelForm):
     def analyze(self): 
         desc = self['desc'].value().replace('\r', '')
         url = self['url'].value()
-        analyzer = Analyzer()
+        analyzer = Analyzer(url)
+        paths = analyzer.analyze(desc)
 
-        def split_on_eof(desc):
-            #desc_items = list(filter(None, map(str.lower, desc.split('\n'))))
-            desc_items = list(filter(None, desc.split('\n')))
-            return desc_items
-
-        def split_on_space(item):
-            desc_items = list(filter(None, item.split(' ')))
-            return desc_items
-        
-        #TODO: try and except catch of indexerror in analyzer???
-        paths = []
-        results = {}
-        for line in split_on_eof(desc):
-            try:
-                path = analyzer.search_path(url, line)
-                if not path in paths:
-                    paths.append(path)
-                    results[path] = analyzer.search_content(url, path)
-            except IndexError as e:
-                print('Error: %s' %(e,))
-                '''
-                for item in split_on_space(line):
-                    try:
-                        path = analyzer.search_path(url, item)
-                        if not path in paths:
-                            paths.append(path)
-                            results.append(analyzer.search_content(url, path))
-                    except IndexError as e:
-                        print('Error: %s' %(e,))
-                '''
-        '''
-        print(self.instance.pk)
-        print(paths)
-        print(results)
-        crawler, created = Crawler.objects.get_or_create(
-                template=self.instance.pk, defaults={'paths':';'.join(paths), 'results':';'.join(results), 'url': url,}
-                )
-        if not created:
-            crawler.paths = ';'.join(paths)
-            crawler.results = ';'.join(results)
-            crawler.url = url
-            crawler.save()
-        '''
-        for path, content in results.items():
-            Crawler.objects.create(template= self.instance, xpath= path, content= content, url= url)
+        for path in paths:
+            Crawler.objects.create(template= self.instance, xpath= path, content= analyzer.search_content(path), url= url)
