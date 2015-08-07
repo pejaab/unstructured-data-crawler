@@ -1,6 +1,6 @@
 import lxml.html
 from lxml import etree
-import html as html_tools
+#import html as html_tools
 import re
 import difflib
 import requests
@@ -26,10 +26,11 @@ class Analyzer(object) :
         if e.tag in ["script", "style"] or not isinstance(e.tag, str):
             return
         if e.tag in self.html_block_elements: yield "\n"
-        #if e.tag == "li": yield "• "
         yield e.text
         for c in e.iterchildren():
-            yield from self._html_text_recursive(c)
+            #yield from self._html_text_recursive(c)
+            for h in self._html_text_recursive(c):
+                yield h
         if e.tag in self.html_block_elements: yield "\n"
         yield e.tail
 
@@ -39,7 +40,7 @@ class Analyzer(object) :
         d = lxml.html.document_fromstring(html)
         body = d.xpath('//body')[0]
         text = "".join(filter(None, self._html_text_recursive(body)))
-        text = html_tools.unescape(text)
+        #text = html_tools.unescape(text)
         text = re.sub("[ \t\n]+", " ", text).strip()
         text = re.sub("^[  \t\n]+", "", text, flags=re.M).strip()
         return(text)
@@ -49,10 +50,11 @@ class Analyzer(object) :
         if e.tag in ["script", "style"] or not isinstance(e.tag, str):
             return
         if e.tag in self.html_block_elements: yield (e, "\n")
-        #if e.tag == "li": yield "• "
         yield (e, e.text)
         for c in e.iterchildren():
-            yield from self._html_text_recursive_search(c)
+            for h in self._html_text_recursive_search(c):
+                yield h
+            #yield from self._html_text_recursive_search(c)
         if e.tag in self.html_block_elements: yield (e, "\n")
         yield (e, e.tail)
 
