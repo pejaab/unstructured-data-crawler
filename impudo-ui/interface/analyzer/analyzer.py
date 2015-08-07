@@ -99,7 +99,7 @@ class Analyzer(object) :
             return path
 
 
-    def search_content(self, path):
+    def find_content(self, path):
         try:
             result = self.elem_tree.xpath(path)[0]
         except IndexError as e:

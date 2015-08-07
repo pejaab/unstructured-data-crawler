@@ -46,4 +46,4 @@ class TemplateForm(forms.models.ModelForm):
         paths = analyzer.analyze(desc)
 
         for path in paths:
-            Crawler.objects.create(template= self.instance, xpath= path, content= analyzer.search_content(path), url= url)
+            Crawler.objects.create(template= self.instance, xpath= path, content= analyzer.find_content(path), url= url)

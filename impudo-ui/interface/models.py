@@ -20,7 +20,6 @@ class Crawler(models.Model):
     xpath = models.TextField()
     content = models.TextField()
     url = models.URLField()
-    active = models.BooleanField(default=False)
     crawled = models.CharField(max_length=20, default='False')
 
     def __str__(self):
