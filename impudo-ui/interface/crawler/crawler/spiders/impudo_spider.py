@@ -7,9 +7,14 @@ import scrapy
 import re 
 from scrapy.spiders import CrawlSpider, Rule 
 from scrapy.linkextractors import LinkExtractor
-from crawler.items import Product
+
+from scrapy.crawler import CrawlerProcess
+from scrapy.utils.project import get_project_settings
+
 from analyzer.analyzer import Analyzer
 from crawler.dao import Dao
+
+import sys
 
 
 class ImpudoSpider(CrawlSpider):
@@ -72,3 +77,10 @@ class ImpudoSpider(CrawlSpider):
 		else:
 			self.logger.warning('No content found on %s in domain %s', response.url, self.allowed_domains[0])
 
+if __name__ == "__main__":
+	
+	#process = CrawlerProcess(get_project_settings())
+	#print 'Argument List:', str(sys.argv)
+
+	#process.crawl(ImpudoSpider)
+	#process.start()
