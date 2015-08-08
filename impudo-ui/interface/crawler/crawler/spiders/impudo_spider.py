@@ -66,7 +66,7 @@ class ImpudoSpider(CrawlSpider):
 	        a = Analyzer(response.url)	
 		content = a.find_content(self.xpath)
 
-		title = a.find_content("/html/head/title")
+		title = response.xpath("/html/head/title/text()").extract()
 		url = response.url
 
 
