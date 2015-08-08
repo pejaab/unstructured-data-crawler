@@ -102,11 +102,14 @@ class Analyzer(object) :
 
 
     def find_content(self, path):
+        result = ''
         try:
             result = self.elem_tree.xpath(path)[0]
         except IndexError as e:
             result = self.elem_tree.xpath(path[:path.rfind('/')])[0]
         finally:
+            if not result:
+                return ''
             result_html = lxml.etree.tostring(result).decode('utf-8')
             return self._html_to_text(result_html)
 
