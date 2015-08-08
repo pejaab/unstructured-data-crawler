@@ -62,10 +62,13 @@ class ImpudoSpider(CrawlSpider):
 		a = Analyzer(response.url)	
 		content = a.find_content(self.xpath)
 
-		title = response.xpath("/html/head/title/text()").extract()
+		title = response.xpath("/html/head/title/text()").extract()[0]
 		url = response.url
 
+		#ignore if no content is found
 		if content:
-			print title, response.url, content
+			print title.encode('utf-8'), response.url, content.encode('utf-8')
 			#self.dao.insert_record(title, response.url, content, self.templateid)
+		else:
+			self.logger.warning('No content found on %s in domain %s', response.url, self.allowed_domains[0])
 
