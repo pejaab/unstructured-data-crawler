@@ -65,7 +65,7 @@ class ImpudoSpider(CrawlSpider):
 		title = response.xpath("/html/head/title/text()").extract()
 		url = response.url
 
+		if content:
+			print title, response.url, content
+			#self.dao.insert_record(title, response.url, content, self.templateid)
 
-		print title, response.url, content
-		
-		#self.dao.insert_record(title, response.url, content, self.templateid)
