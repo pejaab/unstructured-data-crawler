@@ -18,20 +18,26 @@ class ImpudoSpider(CrawlSpider):
 	allowed_domains = ["etoz.ch"]
 	start_urls = ["http://www.etoz.ch"]
 
-	'''rules = (
-
-		Rule(LinkExtractor(allow=('/collection/','/tag/')), follow=True),
-		Rule(LinkExtractor(allow=('/.+/'), deny=('/tag/', '/designers/')), callback='parse_product'),
-
+	#follow all links
+	rules = (
+		Rule(LinkExtractor(allow=('')), callback='parse_product', follow=True),
 		)
-	'''
+	
 
 
 	def __init__(self, domain= '', start_url=''):
+		#set domain and start_url 
+		#usage: scrapy crawl impudo -a domain=example.com -a start_url=http://example.com/
+		if start_url and domain:
+			self.start_urls=[]
+			self.start_urls.append(start_url)
+			self.allowed_domains=[]
+			self.allowed_domains.append(domain)
+
 		self.dao = Dao()
 
 		#get and set rules for specific domain
-		textrules = self.dao.get_rules(self.allowed_domains[0])
+		'''textrules = self.dao.get_rules(self.allowed_domains[0])
 		
 		follows = tuple(textrules[0].split(','))
 		parses = tuple(textrules[1].split(','))
@@ -42,7 +48,7 @@ class ImpudoSpider(CrawlSpider):
 			Rule(LinkExtractor(allow=follows, deny=follow_denies), follow=True),
 			Rule(LinkExtractor(allow=parses, deny=parse_denies), callback='parse_product'),
 
-		)
+		) '''
 
 		super(ImpudoSpider, self).__init__()
 		
@@ -52,18 +58,8 @@ class ImpudoSpider(CrawlSpider):
 		self.templateid = result[1]
 
 
-		if start_url and domain:
-			start_urls=[]
-			start_urls.append(start_url)
-			allowed_domains=[]
-			allowed_domains.append(domain)
-
-	
-	#def parse(self, response):
-	#	pass
-
 	def parse_product(self, response):
-	        a = Analyzer(response.url)	
+		a = Analyzer(response.url)	
 		content = a.find_content(self.xpath)
 
 		title = response.xpath("/html/head/title/text()").extract()
@@ -71,17 +67,5 @@ class ImpudoSpider(CrawlSpider):
 
 
 		print title, response.url, content
-
+		
 		#self.dao.insert_record(title, response.url, content, self.templateid)
-
-		'''
-		item = Product()
-
-		text = ""
-
-		item['image_urls'] = []
-
-		item['title'] = ""
-		item['desc'] = content  
-		'''
-
