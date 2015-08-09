@@ -2,7 +2,6 @@ import os
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
-
 import scrapy
 import re 
 from scrapy.spiders import CrawlSpider, Rule 
@@ -12,10 +11,8 @@ from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 
 from analyzer.analyzer import Analyzer
-from crawler.dao import Dao
-from crawler.items import Product
-
-import sys
+from dao import Dao
+from items import Product
 
 
 class ImpudoSpider(CrawlSpider):
