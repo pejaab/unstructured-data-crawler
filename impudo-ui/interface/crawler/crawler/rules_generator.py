@@ -1,6 +1,7 @@
 import difflib
 from difflib import SequenceMatcher
 from dao import Dao
+import re
 
 def remove_host(url, domain):
 	return url[url.find(domain)+len(domain):]
@@ -22,7 +23,7 @@ def save_rules(urls, domain):
 	d = Dao()
 	
 	follow_rules=""
-	parse_rules = generate_rule(TestUrls,domain)
+	parse_rules = re.escape(generate_rule(TestUrls,domain))
 	follow_rules_deny = ""
 	parse_rules_deny = ""
 
@@ -46,7 +47,6 @@ if __name__ == "__main__":
 	TestUrls2 = ["http://www.etoz.ch/la-tourette/",
 		"http://www.etoz.ch/victoria-lounge-chair/",
 	]
-
 
 
 
