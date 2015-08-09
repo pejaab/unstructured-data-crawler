@@ -30,4 +30,6 @@ class Record(models.Model):
     title = models.CharField(max_length=200, default=None)
     url = models.URLField()
     result = models.TextField()
-
+    
+    def __str__(self):
+        return str(self.pk)
