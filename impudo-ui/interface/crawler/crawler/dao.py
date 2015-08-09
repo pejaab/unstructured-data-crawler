@@ -22,7 +22,7 @@ class Dao(object) :
 
     #get xpath for site
     def get_path(self, url):
-        sql = 'SELECT xpath, template_id from interface_crawler where url like "%{0}%" and active=1 limit 1'.format(url)
+        sql = 'SELECT xpath, template_id from interface_crawler where url like "%{0}%"'.format(url)
         return self.query_sql(sql)
 
     def get_rules(self, url):
