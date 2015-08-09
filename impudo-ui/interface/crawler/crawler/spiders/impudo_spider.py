@@ -22,13 +22,7 @@ class ImpudoSpider(CrawlSpider):
 	name = "impudo"
 	allowed_domains = ["etoz.ch"]
 	start_urls = ["http://www.etoz.ch"]
-
-	#follow all links
-	rules = (
-		Rule(LinkExtractor(allow=('')), callback='parse_product', follow=True),
-		)
 	
-
 
 	def __init__(self, domain= '', start_url=''):
 		#set domain and start_url 
@@ -41,19 +35,26 @@ class ImpudoSpider(CrawlSpider):
 
 		self.dao = Dao()
 
-		#get and set rules for specific domain
-		'''textrules = self.dao.get_rules(self.allowed_domains[0])
+		#get and set rules for specific domain if they exist in the db
+		textrules = self.dao.get_rules(self.allowed_domains[0])
 		
-		follows = tuple(textrules[0].split(','))
-		parses = tuple(textrules[1].split(','))
-		follow_denies = tuple(textrules[2].split(','))
-		parse_denies = tuple(textrules[3].split(','))
+		if textrules:
+			follows = tuple(textrules[0].split(','))
+			parses = tuple(textrules[1].split(','))
+			follow_denies = tuple(textrules[2].split(','))
+			parse_denies = tuple(textrules[3].split(','))
 
-		ImpudoSpider.rules = (
-			Rule(LinkExtractor(allow=follows, deny=follow_denies), follow=True),
-			Rule(LinkExtractor(allow=parses, deny=parse_denies), callback='parse_product'),
+			ImpudoSpider.rules = (
+				Rule(LinkExtractor(allow=follows, deny=follow_denies), follow=True),
+				Rule(LinkExtractor(allow=parses, deny=parse_denies), callback='parse_product'),
 
-		) '''
+			)
+		else:
+			#follow all links
+			ImpudoSpider.rules = (
+				Rule(LinkExtractor(allow=('')), callback='parse_product', follow=True),
+			)
+			
 
 		super(ImpudoSpider, self).__init__()
 		
