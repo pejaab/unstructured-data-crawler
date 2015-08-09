@@ -10,6 +10,7 @@ class Dao(object) :
 
     _table_template = 'interface_templateitem'
     _table_record = 'interface_record'
+    _table_rules = 'impudo_rules'
 
     # def __init__(self):
     #     self.conn = mysql.connector.connect(user='root', passwd='idp2015', host='46.38.236.133', database='impudo')
@@ -42,6 +43,10 @@ class Dao(object) :
         title = title.replace('\'', '\'\'')
 
         sql = "INSERT INTO {0} (title, url, result, template_id) VALUES ('{1}', '{2}', '{3}',{4})".format(self._table_record, title, url, result, template_id)
+        self.execute_sql(sql)
+
+    def insert_rule(self,domain, follow_rules, parse_rules, follow_rules_deny, parse_rules_deny):
+        sql = "INSERT INTO {0} (domain, follow_rules, parse_rules, follow_rules_deny, parse_rules_deny) VALUES ('{1}', '{2}', '{3}','{4}', '{5}')".format(self._table_rules, domain, follow_rules, parse_rules, follow_rules_deny, parse_rules_deny)
         self.execute_sql(sql)
 
     def execute_sql(self, sql):

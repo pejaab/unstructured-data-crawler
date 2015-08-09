@@ -7,9 +7,15 @@ import scrapy
 import re 
 from scrapy.spiders import CrawlSpider, Rule 
 from scrapy.linkextractors import LinkExtractor
-from crawler.items import Product
+
+from scrapy.crawler import CrawlerProcess
+from scrapy.utils.project import get_project_settings
+
 from analyzer.analyzer import Analyzer
 from crawler.dao import Dao
+from crawler.items import Product
+
+import sys
 
 
 class ImpudoSpider(CrawlSpider):
@@ -17,32 +23,39 @@ class ImpudoSpider(CrawlSpider):
 	name = "impudo"
 	allowed_domains = ["etoz.ch"]
 	start_urls = ["http://www.etoz.ch"]
-
-	'''rules = (
-
-		Rule(LinkExtractor(allow=('/collection/','/tag/')), follow=True),
-		Rule(LinkExtractor(allow=('/.+/'), deny=('/tag/', '/designers/')), callback='parse_product'),
-
-		)
-	'''
-
+	
 
 	def __init__(self, domain= '', start_url=''):
+		#set domain and start_url 
+		#usage: scrapy crawl impudo -a domain=example.com -a start_url=http://example.com/
+		if start_url and domain:
+			self.start_urls=[]
+			self.start_urls.append(start_url)
+			self.allowed_domains=[]
+			self.allowed_domains.append(domain)
+
 		self.dao = Dao()
 
-		#get and set rules for specific domain
+		#get and set rules for specific domain if they exist in the db
 		textrules = self.dao.get_rules(self.allowed_domains[0])
 		
-		follows = tuple(textrules[0].split(','))
-		parses = tuple(textrules[1].split(','))
-		follow_denies = tuple(textrules[2].split(','))
-		parse_denies = tuple(textrules[3].split(','))
+		if textrules:
+			follows = tuple(textrules[0].split(','))
+			parses = tuple(textrules[1].split(','))
+			follow_denies = tuple(textrules[2].split(','))
+			parse_denies = tuple(textrules[3].split(','))
 
-		ImpudoSpider.rules = (
-			Rule(LinkExtractor(allow=follows, deny=follow_denies), follow=True),
-			Rule(LinkExtractor(allow=parses, deny=parse_denies), callback='parse_product'),
+			ImpudoSpider.rules = (
+				Rule(LinkExtractor(allow=follows, deny=follow_denies), follow=True),
+				Rule(LinkExtractor(allow=parses, deny=parse_denies), callback='parse_product'),
 
-		)
+			)
+		else:
+			#follow all links
+			ImpudoSpider.rules = (
+				Rule(LinkExtractor(allow=('')), callback='parse_product', follow=True),
+			)
+
 
 		super(ImpudoSpider, self).__init__()
 		
@@ -52,36 +65,24 @@ class ImpudoSpider(CrawlSpider):
 		self.templateid = result[1]
 
 
-		if start_url and domain:
-			start_urls=[]
-			start_urls.append(start_url)
-			allowed_domains=[]
-			allowed_domains.append(domain)
-
-	
-	#def parse(self, response):
-	#	pass
-
 	def parse_product(self, response):
-	        a = Analyzer(response.url)	
+		a = Analyzer(response.url)	
 		content = a.find_content(self.xpath)
 
-		title = response.xpath("/html/head/title/text()").extract()
+		title = response.xpath("/html/head/title/text()").extract()[0]
 		url = response.url
 
+		#ignore if no content is found
+		if content:
+			print title.encode('utf-8'), response.url, content.encode('utf-8')
+			#self.dao.insert_record(title, response.url, content, self.templateid)
+		else:
+			self.logger.warning('No content found on %s in domain %s', response.url, self.allowed_domains[0])
 
-		print title, response.url, content
+if __name__ == "__main__":
+	pass
+	#process = CrawlerProcess(get_project_settings())
+	#print 'Argument List:', str(sys.argv)
 
-		#self.dao.insert_record(title, response.url, content, self.templateid)
-
-		'''
-		item = Product()
-
-		text = ""
-
-		item['image_urls'] = []
-
-		item['title'] = ""
-		item['desc'] = content  
-		'''
-
+	#process.crawl(ImpudoSpider)
+	#process.start()
