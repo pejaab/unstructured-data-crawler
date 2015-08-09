@@ -82,6 +82,9 @@ class Analyzer(object) :
     
     
     def _find_path(self, index, text_map, root):
+        '''
+        Finds an xpath.
+        '''
         while text_map.get(index) is None:
             index -= 1
 
@@ -90,6 +93,9 @@ class Analyzer(object) :
 
 
     def _common(self, path_b, path_e):
+        '''
+        Copmutes the common part of the path between path_b and path_e.
+        '''
         s = difflib.SequenceMatcher(None, path_b, path_e)
         t = s.get_matching_blocks()[0]
         path = path_b[:t.size]
@@ -102,6 +108,9 @@ class Analyzer(object) :
 
 
     def find_content(self, path):
+        '''
+        Finds the text referenced by an xpath.
+        '''
         result = ''
         try:
             result = self.elem_tree.xpath(path)[0]
@@ -115,6 +124,9 @@ class Analyzer(object) :
 
 
     def _find_text(self, text, search_string):
+        '''
+        Finds matchings between a search_string and a website text.
+        '''
         s = difflib.SequenceMatcher(None, search_string, text)
         m = s.get_matching_blocks()
         m2 = m
@@ -129,14 +141,23 @@ class Analyzer(object) :
 
 
     def _find_paths(self, matches, text_map, root):
+        '''
+        Find all paths that matches where found for.
+        '''
         paths = []
         for match in matches:
+            # tuple of the beginning of the match and the end of the match so the common path
+            # can be computed
             paths.append((self._find_path(match.b, text_map, root), 
                          self._find_path(match.b+match.size, text_map, root)))
 
         return paths
-    
-    def analyze(self,  search_string):
+   
+
+    def analyze(self, search_string):
+        '''
+        Analyzes a websites content to find xpaths that reference the search_string.
+        '''
         text, text_map, root = self._html_to_text_search(self.r.text)
         search_string = re.sub("[ \t\n]+", " ", search_string)
         matches = self._find_text(text, search_string.lower())
