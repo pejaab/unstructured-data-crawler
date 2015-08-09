@@ -13,6 +13,7 @@ from scrapy.utils.project import get_project_settings
 
 from analyzer.analyzer import Analyzer
 from crawler.dao import Dao
+from crawler.items import Product
 
 import sys
 
@@ -54,7 +55,7 @@ class ImpudoSpider(CrawlSpider):
 			ImpudoSpider.rules = (
 				Rule(LinkExtractor(allow=('')), callback='parse_product', follow=True),
 			)
-			
+
 
 		super(ImpudoSpider, self).__init__()
 		
@@ -79,7 +80,7 @@ class ImpudoSpider(CrawlSpider):
 			self.logger.warning('No content found on %s in domain %s', response.url, self.allowed_domains[0])
 
 if __name__ == "__main__":
-	
+	pass
 	#process = CrawlerProcess(get_project_settings())
 	#print 'Argument List:', str(sys.argv)
 
