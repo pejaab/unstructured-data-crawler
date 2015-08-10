@@ -1,7 +1,5 @@
 from spiders.impudo_spider import ImpudoSpider
-from scrapy.crawler import CrawlerProcess
 from scrapy.crawler import Crawler
-from scrapy.conf import settings
 from scrapy.utils.project import get_project_settings
 
 import sys
@@ -24,22 +22,22 @@ class CrawlerScript(Process):
             self.crawler.start()
             reactor.run()	
 
-def run_spider(url):
+def run_spider():
 	spider = ImpudoSpider()
 	crawler = CrawlerScript(spider)
 	crawler.start()
 	crawler.join()
 
 
+'''
 from multiprocessing import Process
 from scrapy.crawler import CrawlerProcess
-from scrapy.conf import settings
 
 
 class CrawlerScript2():
 
     def __init__(self):
-        self.process = CrawlerProcess(settings)
+        self.process = CrawlerProcess(get_project_settings())
 
     def _crawl(self, spider):
         self.process.crawl(spider)
@@ -51,17 +49,17 @@ class CrawlerScript2():
         p.start()
         p.join()
 
-crawler = CrawlerScript2()
 
 def domain_crawl(args):
     crawler.crawl(args)
+
+'''
 
 if __name__ == "__main__":
 	print "test"
 	#pass
 	#process = CrawlerProcess(get_project_settings())
 	print 'Argument List:', str(sys.argv)
-
 	
 	#process.crawl(ImpudoSpider)
 	#process.start()
