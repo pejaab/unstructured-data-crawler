@@ -27,7 +27,7 @@ class Dao(object) :
     #    return self.cursor
 
     def get_path(self, template_id):
-        sql = 'SELECT xpath from interface_crawler where template_id={0} and active = 1'.format(template_id)
+        sql = 'SELECT xpath from interface_crawler where template_id={0} and active = 1 order by id asc'.format(template_id)
         self.cursor.execute(sql)
         return self.cursor    
 

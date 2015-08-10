@@ -75,18 +75,23 @@ class ImpudoSpider(CrawlSpider):
 	def parse_product(self, response):
 		a = Analyzer(response.url)	
 
+		content = ""
+
+		title = response.xpath("/html/head/title/text()").extract()[0]
+		url = response.url
+
 		for xp in self.xpaths:
-			content = a.find_content(xp)
+			tempcont = a.find_content(xp).encode('utf-8')
 
-			title = response.xpath("/html/head/title/text()").extract()[0]
-			url = response.url
+			if tempcont:
+				content += tempcont
 
-			#ignore if no content is found
-			if content:
-				print title.encode('utf-8'), response.url, content.encode('utf-8')
-				#self.dao.insert_record(title, response.url, content, self.template_id)
-			else:
-				self.logger.warning('No content found on %s in domain %s', response.url, self.allowed_domains[0])
+		#ignore if no content is found
+		if content:
+			print title.encode('utf-8'), response.url, content.encode('utf-8')
+			#self.dao.insert_record(title, response.url, content, self.template_id)
+		else:
+			self.logger.warning('No content found on %s in domain %s', response.url, self.allowed_domains[0])
 
 
 if __name__ == "__main__":
