@@ -32,7 +32,7 @@ class ImpudoSpider(CrawlSpider):
 
 		self.template_id  = template_id
 
-		o = urlparse(dao.get_url(template_id)[0])
+		o = urlparse(self.dao.get_url(template_id)[0])
 
 		#set domain and start_url 
 		self.allowed_domains=[]
