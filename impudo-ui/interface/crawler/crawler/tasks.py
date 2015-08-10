@@ -1,4 +1,5 @@
 from celery import Celery
+import launch_spider
 from launch_spider import CrawlerScript
 
 app = Celery('tasks', backend='rpc://', broker='amqp://')
@@ -10,6 +11,5 @@ def add(x, y):
 
 @app.task
 def scrape():
-	c=CrawlerScript()
-	c.run_spider()
+	launch_spider.run_spider()
 
