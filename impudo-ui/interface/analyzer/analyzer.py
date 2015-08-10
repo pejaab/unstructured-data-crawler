@@ -26,17 +26,10 @@ class Analyzer(object) :
             elem_tree (lxml.etree._ElementTree): Parsed element tree from url.
         """
         self.r = requests.get(url)
-        try:
-            self.r.raise_for_status()
-        except requests.HTTPError as e:
-            raise ValueError
-        
-        try:
-            self.elem_tree = lxml.html.parse(url)
-        except OSError:
-            raise ValueError
-            
-            
+        self.r.raise_for_status()
+        self.elem_tree = lxml.html.document_fromstring(self.r.text)
+           
+
     def _html_text_recursive(self, e):
         """
         Generates the text of elements.
@@ -59,15 +52,14 @@ class Analyzer(object) :
         yield e.tail
 
 
-    def _html_to_text(self, html):
+    def _html_to_text(self, body):
         """
         Generates the text of a website by cleaning the html tags.
 
         Args:
-            html (str): string representation of HTML document.
+            body (str): string representation of HTML document.
 
         Attributes:
-            d (lxml.html.HtmlElement): HTML document
             body (lxml.html.HtmlElement): HTML document containing only body
             text (str): cleand string representation of HTML document
 
@@ -75,9 +67,6 @@ class Analyzer(object) :
             str: Cleaned text of website
         """
 
-        html = html.replace("\r\n","\n")
-        d = lxml.html.document_fromstring(html)
-        body = d.xpath('//body')[0]
         text = "".join(filter(None, self._html_text_recursive(body)))
         #text = html_tools.unescape(text)
         text = re.sub("[ \r\t\n\\xa0]+", " ", text).strip()
@@ -205,8 +194,7 @@ class Analyzer(object) :
         finally:
             if result is None:
                 return ''
-            result_html = lxml.etree.tostring(result).decode('utf-8')
-            return self._html_to_text(result_html)
+            return self._html_to_text(result)
 
     """
     def _find_text(self, text, search_string):
