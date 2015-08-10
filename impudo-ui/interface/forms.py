@@ -28,7 +28,7 @@ class TemplateForm(forms.models.ModelForm):
                 'url': {'required': EMPTY_URL_ERROR},
                 'desc': {'required': EMPTY_DESC_ERROR}
                 }
-    
+     
     def save(self):
         '''
         Saves the missing url_abbr field by pattern matching.
@@ -38,7 +38,7 @@ class TemplateForm(forms.models.ModelForm):
         url_abbr = match.group(2) if match else url
         self.instance.url_abbr = url_abbr
         return super().save() 
-   
+    
     def analyze(self): 
         desc = self['desc'].value().replace('\r', '')
         url = self['url'].value()

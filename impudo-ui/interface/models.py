@@ -1,8 +1,6 @@
 from django.core.urlresolvers import reverse
 from django.db import models
 
-from interface.analyzer.analyzer import Analyzer
-
 class Template(models.Model):
     url_abbr = models.TextField(verbose_name='Name')
     url = models.URLField()
@@ -12,8 +10,7 @@ class Template(models.Model):
         return self.url_abbr
     
     def get_absolute_url(self):
-        return reverse('view_template', args=[self.id])
-
+        return reverse('view_template', args=[self.id])    
 
 class Crawler(models.Model):
     template = models.ForeignKey(Template, default=None)
