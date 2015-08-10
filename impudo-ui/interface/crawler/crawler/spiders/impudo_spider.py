@@ -81,7 +81,7 @@ class ImpudoSpider(CrawlSpider):
 		url = response.url
 
 		for xp in self.xpaths:
-			tempcont = a.find_content(xp).encode('utf-8')
+			tempcont = a.find_content(xp)
 
 			if tempcont:
 				content += tempcont
