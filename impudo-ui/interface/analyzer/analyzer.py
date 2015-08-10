@@ -15,6 +15,16 @@ class Analyzer(object) :
         }
 
     def __init__(self, url):
+        """
+        Preloads the url and parses it into an element tree.
+
+        Args:
+            url (str): e.g. http://www.etoz.ch.model-2145.
+
+        Attributes:
+            r (requests.models.Response): Response fetched from url
+            elem_tree (lxml.etree._ElementTree): Parsed element tree from url.
+        """
         self.r = requests.get(url)
         try:
             self.r.raise_for_status()
@@ -28,6 +38,15 @@ class Analyzer(object) :
             
             
     def _html_text_recursive(self, e):
+        """
+        Generates the text of elements.
+
+        Args:
+            e (lxml.html.HtmlElement): HtmlElement of an element tree.
+
+        Yields:
+            str: The text of the next element or a new line.
+        """
         if e.tag in ["script", "style"] or not isinstance(e.tag, str):
             return
         if e.tag in self.html_block_elements: yield "\n"
@@ -41,6 +60,21 @@ class Analyzer(object) :
 
 
     def _html_to_text(self, html):
+        """
+        Generates the text of a website by cleaning the html tags.
+
+        Args:
+            html ():
+
+        Attributes:
+            d ():
+            body ():
+            text (str):
+
+        Returns:
+            str: Text of website
+        """
+
         html = html.replace("\r\n","\n")
         d = lxml.html.document_fromstring(html)
         body = d.xpath('//body')[0]
@@ -52,6 +86,16 @@ class Analyzer(object) :
 
 
     def _html_text_recursive_search(self, e):
+        """
+        Generates the text of elements.
+
+        Args:
+            e (lxml.html.HtmlElement): HtmlElement of an element tree.
+
+        Yields:
+            str: The text of the next element or a new line.
+        """
+
         if e.tag in ["script", "style"] or not isinstance(e.tag, str):
             return
         if e.tag in self.html_block_elements: yield (e, "\n")
@@ -65,6 +109,20 @@ class Analyzer(object) :
 
 
     def _html_to_text_search(self, html):
+        """
+        Generates the text of a website by cleaning the html tags.
+
+        Args:
+            html ():
+
+        Attributes:
+            d ():
+            body ():
+            text (str):
+
+        Returns:
+            str: Text of website
+        """
         html = html.replace("\r\n","\n")
         d = lxml.html.document_fromstring(html)
         body = d.xpath('//body')[0]
