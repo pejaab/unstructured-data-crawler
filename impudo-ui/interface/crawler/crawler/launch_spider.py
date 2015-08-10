@@ -25,8 +25,8 @@ def run_spider(template_id):
     crawler = CrawlerScript(spider)
     crawler.crawl()
 
+'''
 
-"""
 #based on http://stackoverflow.com/a/22202877
 class CrawlerScript(Process):
         def __init__(self, spider):
@@ -49,6 +49,7 @@ def run_spider():
 	crawler.join()
 
 
+'''
 '''
 from multiprocessing import Process
 from scrapy.crawler import CrawlerProcess
@@ -78,10 +79,10 @@ def domain_crawl(args):
 if __name__ == "__main__":
 	print "test"
 	#pass
-	#process = CrawlerProcess(get_project_settings())
-	print 'Argument List:', str(sys.argv)
+	process = CrawlerProcess(get_project_settings())
+	#print 'Argument List:', str(sys.argv)
 	
-	#process.crawl(ImpudoSpider)
-	#process.start()
+	process.crawl(ImpudoSpider, template_id=27)
+	process.start()
 
-"""
+
