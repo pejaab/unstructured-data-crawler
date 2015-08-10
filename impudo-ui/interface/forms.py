@@ -6,8 +6,8 @@ from interface.models import Template, Crawler
 from interface.analyzer.analyzer import Analyzer
 
 
-EMPTY_URL_ERROR = 'You cannot have an empty URL'
-EMPTY_DESC_ERROR = 'You cannot have an empty description'
+EMPTY_URL_ERROR = 'You need to supply a URL'
+EMPTY_DESC_ERROR = 'You need to supply a description'
 
 class TemplateForm(forms.models.ModelForm):
 

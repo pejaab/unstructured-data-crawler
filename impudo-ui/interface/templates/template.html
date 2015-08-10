@@ -6,40 +6,44 @@
 {% block header_text %}Crawler: {{ item.url_abbr }}{% endblock %}
 {% block table %}
 
-<form method='POST' action={% url 'view_template' item.id %}> 
-  <div class='row'>
-    <div class='col-xs-2'></div>
-    <div class='col-xs-5'><h5>Your Input</h5></div>
-    <div class='col-xs-5'><h5>Crawler Output</h5></div>
-  </div>
-  <div class='row top-buffer'>
-    <div class='col-xs-2'><h5>Scraping Depth</h5></div>
-    <div class='col-xs-5 align-top'>{{ form.url }}</div>
-    <div class='col-xs-5'>{{ item.url }}</div>
-  </div>
-  <div class='row top-buffer'>
-    <div class='col-xs-2'><h5>Descriptional Content</h5></div>
-    <div class='col-xs-5'>{{ form.desc }}</div>
-    <div class='col-xs-5'>
-      {% for record in item.crawler_set.all %}
-        <input type='checkbox' name='record' value={{ record.id }}>{{ record.content }}<br>
-      {% endfor %}
+  <form method='POST' action={% url 'view_template' item.id %}> 
+    <div class='row'>
+      <div class='col-xs-2'></div>
+      <div class='col-xs-5'><h5>Your Input</h5></div>
+      <div class='col-xs-5'><h5>Crawler Output</h5></div>
     </div>
-  </div>
-  <div class='row top-buffer'>
-    <div class='col-xs-2'></div>
-    <div class='col-xs-5'>
-      <input id='id_submit' type='submit' name='change' value='Change crawler template' class='btn btn-default'>
+    <div class='row top-buffer'>
+      <div class='col-xs-2'><h5>Scraping Depth</h5></div>
+      <div class='col-xs-5 align-top'>{{ form.url }}</div>
+      <div class='col-xs-5'>{{ item.url }}</div>
     </div>
-    <div class='col-xs-5'>
-      <input id='id_dispatch' type='submit' name='dispatch' value='Save & dispatch crawler' class='btn btn-default'>
+    <div class='row top-buffer'>
+      <div class='col-xs-2'><h5>Descriptional Content</h5></div>
+      <div class='col-xs-5'>{{ form.desc }}</div>
+      <div class='col-xs-5'>
+        {% for record in item.crawler_set.all %}
+          <input type='checkbox' name='record' value={{ record.id }}>{{ record.content }}<br>
+        {% endfor %}
+      </div>
     </div>
-    {% csrf_token %}
-    {% if form.errors %}
-    <div class='form-group has-error'>
-      <span class='help-block'>{{ form.url.errors }}</span>
-      <span class='help-block'>{{ form.desc.errors }}</span>
+    <div class='row top-buffer'>
+      <div class='col-xs-2'></div>
+      <div class='col-xs-5'>
+        <input id='id_submit' type='submit' name='change' value='Change crawler template' class='btn btn-default'/>
+      </div>
+      <div class='col-xs-5'>
+        <input id='id_dispatch' type='submit' name='dispatch' value='Save & dispatch crawler' class='btn btn-default'/>
+      </div>
+      {% csrf_token %}
     </div>
+    {% if form.errors or not_selected_error %}
+      <div class='text-center'>
+        <div class='form-group has-error'>
+          <span class='help-block'>{{ form.url.errors }}</span>
+          <span class='help-block'>{{ form.desc.errors }}</span>
+          <span class='help-block'>{{ not_selected_error }}</span>
+        </div>
+      </div>
     {% endif %}
   </form>
 {% endblock %}
