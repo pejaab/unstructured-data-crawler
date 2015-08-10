@@ -2,6 +2,10 @@ import os
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
 import scrapy
 import re 
 from scrapy.spiders import CrawlSpider, Rule 
@@ -77,9 +81,8 @@ class ImpudoSpider(CrawlSpider):
 			self.logger.warning('No content found on %s in domain %s', response.url, self.allowed_domains[0])
 
 if __name__ == "__main__":
-	pass
-	#process = CrawlerProcess(get_project_settings())
-	#print 'Argument List:', str(sys.argv)
+	process = CrawlerProcess(get_project_settings())
+	print 'Argument List:', str(sys.argv)
 
-	#process.crawl(ImpudoSpider)
-	#process.start()
+	process.crawl(ImpudoSpider)
+	process.start()
