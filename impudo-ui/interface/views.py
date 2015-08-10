@@ -23,6 +23,7 @@ def view_template(request, template_id):
                 # Activate selected records
                 for record_id in request.POST.getlist('record'):
                     record = Crawler.objects.get(id=int(record_id))
+                    record.active = 1
                     record.save()
                 #TODO: return to manage page
                 # Only active records are kept in database 
