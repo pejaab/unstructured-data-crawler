@@ -64,15 +64,15 @@ class Analyzer(object) :
         Generates the text of a website by cleaning the html tags.
 
         Args:
-            html ():
+            html (str): string representation of HTML document.
 
         Attributes:
-            d ():
-            body ():
-            text (str):
+            d (lxml.html.HtmlElement): HTML document
+            body (lxml.html.HtmlElement): HTML document containing only body
+            text (str): cleand string representation of HTML document
 
         Returns:
-            str: Text of website
+            str: Cleaned text of website
         """
 
         html = html.replace("\r\n","\n")
@@ -82,7 +82,7 @@ class Analyzer(object) :
         #text = html_tools.unescape(text)
         text = re.sub("[ \r\t\n\\xa0]+", " ", text).strip()
         text = re.sub("^[  \t\n]+", "", text, flags=re.M).strip()
-        return(text)
+        return text
 
 
     def _html_text_recursive_search(self, e):
@@ -113,16 +113,20 @@ class Analyzer(object) :
         Generates the text of a website by cleaning the html tags.
 
         Args:
-            html ():
+            html (str): string representation of HTML document.
 
         Attributes:
-            d ():
-            body ():
-            text (str):
+            d (lxml.html.HtmlElement): HTML document
+            body (lxml.html.HtmlElement): HTML document containing only body
+            elements (): 
+            kill_whitespace (boolean): 
+            text (str): cleand string representation of HTML document
+            text_map ():
 
         Returns:
-            str: Text of website
+            str: Cleaned text of website
         """
+
         html = html.replace("\r\n","\n")
         d = lxml.html.document_fromstring(html)
         body = d.xpath('//body')[0]
@@ -144,9 +148,20 @@ class Analyzer(object) :
     
     
     def _find_path(self, index, text_map, root):
-        '''
-        Finds an xpath.
-        '''
+        """
+        Finds an xpath corresponding to the closest entry in a mapping between index and element.
+
+        Args:
+            index (int):
+            text_map ():
+            root ():
+
+        Attributes:
+            tree
+
+        Returns:
+            
+        """
         while text_map.get(index) is None:
             index -= 1
         
@@ -170,9 +185,18 @@ class Analyzer(object) :
     """
 
     def find_content(self, path):
-        '''
+        """
         Finds the text referenced by an xpath.
-        '''
+
+        Args:
+            path ():
+
+        Attributes:
+            result ():
+
+        Returns:
+            
+        """
         result = None
         try:
             result = self.elem_tree.xpath(path)[0]
@@ -218,6 +242,25 @@ class Analyzer(object) :
     def _find_paths(self, matches, t_length, text_map, root):
         '''
         Find all paths that matches where found for.
+
+        Args:
+            matches ():
+            t_length ():
+            text_map ():
+            root ():
+
+        Attributes:
+            paths ():
+            sort_m ():
+            v ():
+            k2 ():
+            f ():
+            d ():
+            a_paths ():
+            result ():
+
+        Returns:
+            
         '''
         paths = []
         sort_m = sorted(matches)
@@ -251,6 +294,23 @@ class Analyzer(object) :
         return result
         
     def _find_text(self, text, search_string):
+        """
+        
+
+        Args:
+            text ():
+            search_string ():
+
+        Attributes:
+            diff ():
+            i_section ():
+            last_word_diff (boolean):
+            start_p (boolean):
+
+        Returns:
+            
+        """
+        
         diff = {}
         i_section = {}
         last_word_diff = False
@@ -298,9 +358,20 @@ class Analyzer(object) :
         return diff, i_section        
 
     def analyze(self, search_string):
-        '''
+        """
         Analyzes a websites content to find xpaths that reference the search_string.
-        '''
+
+        Args:
+            search_string ():
+
+        Attributes:
+            text ():
+            text_map ():
+            root ():
+            diff ():
+            i_section ():
+            i_paths ():
+        """
         text, text_map, root = self._html_to_text_search(self.r.text)
         search_string = re.sub("[ \t\n]+", " ", search_string).lower()
         search_string = re.sub("[ \t\n]+$", "", search_string)
