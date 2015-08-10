@@ -20,8 +20,8 @@ class CrawlerScript(Process):
         p.start()
         p.join()
 
-def run_spider():
-    spider = ImpudoSpider()
+def run_spider(template_id):
+    spider = ImpudoSpider(template_id)
     crawler = CrawlerScript(spider)
     crawler.crawl()
 
