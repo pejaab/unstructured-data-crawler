@@ -1,5 +1,5 @@
 import scrapy
-import Image
+#import Image
 from crawler.items import Product
 
 class ImageSpider(scrapy.Spider):
