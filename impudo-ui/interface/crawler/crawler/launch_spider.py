@@ -77,10 +77,10 @@ def domain_crawl(args):
 '''
 
 if __name__ == "__main__":
-	print "test"
+	print("test")
 	#pass
 	process = CrawlerProcess(get_project_settings())
-	#print 'Argument List:', str(sys.argv)
+	#print('Argument List:', str(sys.argv))
 	
 	process.crawl(ImpudoSpider, template_id=27)
 	process.start()
