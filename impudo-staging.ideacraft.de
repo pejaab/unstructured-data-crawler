@@ -1,0 +1,14 @@
+server {
+	listen 80;
+	server_name impudo-staging.ideacraft.de;
+	
+	location /static {
+		alias /home/pejaab/sites/impudo-staging.ideacraft.de/impudo/static;
+	}	
+
+	location / {	
+		proxy_set_header Host $host;
+		proxy_pass http://unix:/tmp/impudo-staging.ideacraft.de.socket;
+	}
+
+}
