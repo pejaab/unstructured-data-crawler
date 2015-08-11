@@ -10,7 +10,7 @@ class CrawlerScript(Process):
     
     def __init__(self, spider, template_id):
         Process.__init__(self)
-        self.crawler = Crawler(spider, get_project_settings())
+        self.crawler = Crawler(ImpudoSpider, get_project_settings())
         self.crawler.signals.connect(reactor.stop, signal=signals.spider_closed)
         #self.spider = spider
         self.template_id = template_id
