@@ -5,8 +5,7 @@ class Dao(object) :
     #default database configuration
     _user = 'root'
     _passwd = 'idp2015'
-    #_host = '46.38.236.133'
-    _host = 'localhost'
+    _host = '46.38.236.133'
     _db = 'impudo'
 
     _table_template = 'interface_templateitem'
