@@ -19,17 +19,19 @@ class ImpudoImagesPipeline(ImagesPipeline):
 	def item_completed(self, results, item, info):
 		image_paths = [x['path'] for ok, x in results if ok]
 		item['image_paths'] = image_paths
-		print "ImpudoPipeline:"  
-		print results
-		print "Image_paths"
-		print image_paths
 
-		print item['title']
-
+		self.save_item_in_db(item)
+		
 		return item
 
 	def save_item_in_db(self, item):
-		
-		self.d.insert_record(item['title'], item['url'], item['url'], item['template_id'])
+		#insert record
+		self.d.insert_record(item['title'], item['url'], item['content'], item['template_id'])
 		recordid = self.d.get_last_insert_id()[0]
-		pass
+
+		image_urls = item['image_urls']
+		image_paths = item['image_paths']
+		#insert pictures
+		for index in range(len(image_urls)):
+			self.d.insert_picture(image_urls[index], image_paths[index], item['template_id'])
+		
