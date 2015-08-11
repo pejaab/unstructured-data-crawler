@@ -81,9 +81,9 @@ WSGI_APPLICATION = 'impudo.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'mysql.connector.django',
-        'NAME': 'django_db',
+        'NAME': 'impudo',
         'USER': 'root',
-        'PASSWORD': 'impudo2015'
+        'PASSWORD': 'idp2015'
     }
 }
 
