@@ -5,7 +5,7 @@
 
 {% block branding %}
 <a class="navbar-brand" href="{% url 'admin:index' %}">{% if site_header %}{{ site_header }}{% else %}{% render_with_template_if_exist "admin/admin_title.html" _('Django administration') %}{% endif %}</a>
-<a class="navbar-brand" href="{% url 'home' %}">Create crawler</a>
+<a class="navbar-brand" href="{% url 'home' %}">Create Crawler</a>
 {% endblock %}
 
 {% block nav-global %}{% endblock %}
