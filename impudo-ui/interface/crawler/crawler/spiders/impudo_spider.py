@@ -89,6 +89,12 @@ class ImpudoSpider(CrawlSpider):
 		#ignore if no content is found
 		if content:
 			print title.encode('utf-8'), response.url, content.encode('utf-8')
+
+			p = Product()
+			p['title'] = title
+			p['content'] = content
+			p['image_urls'] = []
+			yield p 
 			#self.dao.insert_record(title, response.url, content, self.template_id)
 		else:
 			self.logger.warning('No content found on %s in domain %s', response.url, self.allowed_domains[0])

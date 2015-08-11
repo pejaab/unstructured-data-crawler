@@ -10,6 +10,7 @@ import scrapy
 
 class Product(scrapy.Item):
 	title = scrapy.Field()
-	desc = scrapy.Field()
+	content = scrapy.Field()
 	image_urls = scrapy.Field()
 	images = scrapy.Field()
+	image_paths = scrapy.Field()
