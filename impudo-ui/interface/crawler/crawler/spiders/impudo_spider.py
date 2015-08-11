@@ -88,8 +88,10 @@ class ImpudoSpider(CrawlSpider):
 			print title.encode('utf-8'), response.url, content.encode('utf-8')
 
 			p = Product()
+			p['template_id'] = self.template_id
 			p['title'] = title
 			p['content'] = content
+			p['url'] = response.url
 			p['image_urls'] = []
 			#yield p 
 			self.dao.insert_record(title, response.url, content, self.template_id)

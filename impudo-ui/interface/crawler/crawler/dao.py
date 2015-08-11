@@ -39,6 +39,13 @@ class Dao(object) :
         sql = 'SELECT url from interface_template where id={0}'.format(template_id)
         return self.query_sql(sql)
 
+    def insert_picture(self, url, path, record_id):
+        sql = "INSERT INTO interface_pictures (url, path, record_id) VALUES ('{0}', '{1}', {2})".format(url, path, record_id)
+        self.execute_sql(sql)
+
+    def get_last_insert_id(self):
+        return self.query_sql("SELECT LAST_INSERT_ID()")
+
     '''def get_template(self):
         sql = 'SELECT id, url, desc from {0} limit 1'.format(self._table_template);
         return self.query_sql(sql)

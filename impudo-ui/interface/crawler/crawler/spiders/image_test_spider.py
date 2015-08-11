@@ -13,6 +13,11 @@ class ImageSpider(scrapy.Spider):
 	def parse(self, response):
 
 		product = Product()
+		product['template_id'] = 27
+		product['title'] = "Test-Title"
+		product['content'] = "Test-Content"
+		product['url'] = "http://testurl.com/"
+
 		image_urls = []
 
 		extractedurls = response.xpath(self.imagexpath).extract()
@@ -24,7 +29,7 @@ class ImageSpider(scrapy.Spider):
 			image_urls.append(url)
 		
 		product['image_urls'] = image_urls
-		print product['image_urls']
+		#print product['template_id']
 		#print product['images']
 		return product
 		
