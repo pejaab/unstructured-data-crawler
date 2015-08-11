@@ -22,10 +22,7 @@ from urlparse import urlparse
 
 class ImpudoSpider(CrawlSpider):
 	"""docstring for ImpudoSpider"""
-	name = "impudo"
-	allowed_domains = ["etoz.ch"]
-	start_urls = ["http://www.etoz.ch"]
-	
+	name = "impudo"	
 
 	def __init__(self, template_id):
 		self.dao = Dao()
@@ -94,8 +91,8 @@ class ImpudoSpider(CrawlSpider):
 			p['title'] = title
 			p['content'] = content
 			p['image_urls'] = []
-			yield p 
-			#self.dao.insert_record(title, response.url, content, self.template_id)
+			#yield p 
+			self.dao.insert_record(title, response.url, content, self.template_id)
 		else:
 			self.logger.warning('No content found on %s in domain %s', response.url, self.allowed_domains[0])
 

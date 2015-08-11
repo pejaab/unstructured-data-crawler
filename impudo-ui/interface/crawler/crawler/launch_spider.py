@@ -1,29 +1,35 @@
 from billiard import Process
-from scrapy.crawler import CrawlerProcess
+#from multiprocessing import Process
+from scrapy.crawler import Crawler
 from scrapy.utils.project import get_project_settings
 from spiders.impudo_spider import ImpudoSpider
+from twisted.internet import reactor
+from scrapy import signals
 
 class CrawlerScript(Process):
     
-    def __init__(self, spider):
+    def __init__(self, spider, template_id):
         Process.__init__(self)
-        self.crawler = CrawlerProcess(get_project_settings())
-        self.spider = spider
+        self.crawler = Crawler(spider, get_project_settings())
+        self.crawler.signals.connect(reactor.stop, signal=signals.spider_closed)
+        #self.spider = spider
+        self.template_id = template_id
 
     def run(self):
-        self.crawler.crawl(self.spider)
-        self.crawler.start()
-        self.crawler.stop()
+        self.crawler.crawl(self.template_id)
+        reactor.run()
 
-    def crawl(self):
-        p = Process(target=self.run)
-        p.start()
-        p.join()
+    #def crawl(self):
+    #    self.start()
+    #    self.join()
 
 def run_spider(template_id):
     spider = ImpudoSpider(template_id)
-    crawler = CrawlerScript(spider)
-    crawler.crawl()
+    crawler = CrawlerScript(spider, template_id)
+    crawler.start()
+    crawler.join
+    #crawler.crawl()
+
 
 '''
 
