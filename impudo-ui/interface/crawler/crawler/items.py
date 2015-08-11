@@ -9,8 +9,10 @@ import scrapy
 
 
 class Product(scrapy.Item):
+	template_id = scrapy.Field()
 	title = scrapy.Field()
 	content = scrapy.Field()
+	url = scrapy.Field()
 	image_urls = scrapy.Field()
 	images = scrapy.Field()
 	image_paths = scrapy.Field()
