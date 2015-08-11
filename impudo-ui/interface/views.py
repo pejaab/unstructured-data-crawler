@@ -4,8 +4,7 @@ from django.shortcuts import redirect, render
 
 from interface.forms import TemplateForm
 from interface.models import Template, Crawler
-from interface.crawler.crawler import launch_spider
-from interface.crawler.crawler import tasks
+from interface.tasks import scrape
 
 NO_SELECTION_ERROR = 'You need to select at least one option'
 
@@ -33,7 +32,7 @@ def view_template(request, template_id):
                     return render(request, 'template.html', 
                             {'form': form, 'item': item, 'not_selected_error': NO_SELECTION_ERROR})
                 else:
-                    tasks.scrape.delay(template_id)
+                    scrape.delay(template_id)
                     return render(request, 'home.html', {'form': TemplateForm()})
 
             # Delete xpath records before re-searching them

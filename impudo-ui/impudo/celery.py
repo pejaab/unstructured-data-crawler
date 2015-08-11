@@ -1,8 +1,10 @@
-from celery import Celery
+from __future__ import absolute_import
 
 import os
 
-import launch_spider
+from celery import Celery
+
+
 
 # set the defualt Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'impudo.settings')
