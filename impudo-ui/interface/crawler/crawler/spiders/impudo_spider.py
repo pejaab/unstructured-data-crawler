@@ -87,6 +87,11 @@ class ImpudoSpider(CrawlSpider):
 		if content:
 			print title.encode('utf-8'), response.url, content.encode('utf-8')
 
+			#convert to utf8
+			title = title.encode('utf-8')
+			content = content.encode('utf-8')
+			
+
 			p = Product()
 			p['template_id'] = self.template_id
 			p['title'] = title
