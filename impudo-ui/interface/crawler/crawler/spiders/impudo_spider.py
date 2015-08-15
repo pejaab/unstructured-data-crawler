@@ -81,7 +81,7 @@ class ImpudoSpider(CrawlSpider):
 			tempcont = a.find_content(xp)
 
 			if tempcont:
-				content += tempcont
+				content += ' ' + tempcont
 
 		#ignore if no content is found
 		if content:
