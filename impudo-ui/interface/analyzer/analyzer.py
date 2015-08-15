@@ -4,6 +4,7 @@ from lxml import etree
 import re
 import difflib
 import requests
+import urlparse
 
 class Analyzer(object) :
 
@@ -25,6 +26,7 @@ class Analyzer(object) :
             r (requests.models.Response): Response fetched from url
             elem_tree (lxml.etree._ElementTree): Parsed element tree from url.
         """
+        self.url = url
         self.r = requests.get(url)
         self.r.raise_for_status()
         self.elem_tree = lxml.html.document_fromstring(self.r.text)
@@ -134,6 +136,63 @@ class Analyzer(object) :
             text += t.lower()
 
         return text, text_map, d
+
+    def _html_img_recursive(self, e):
+        if e.tag in ["script", "style"] or not isinstance(e.tag, str):
+            return
+        if e.tag == 'img': yield (e, e.attrib)
+        #TODO: if nothing is returned then turn of this condition
+        #if e.tag == "a": # thumbnails usually are below 'a' and are not needed
+            #return
+        for c in e.iterchildren():
+            for h in self._html_img_recursive(c):
+                yield h
+
+    def _html_to_img(self):
+        body = self.elem_tree.xpath('//body')[0]
+        elements = self._html_img_recursive(body)
+        return elements, body
+
+    def _find_img_urls(self, elements, url, url_extended):
+        result = []
+        for elem,attr in elements:
+            if elem.tag == "img":
+                l = attr.get('src', None)
+            #elif elem.tag == "a":
+                #l = attr.get('href', None)
+            if l is None:
+                continue
+            l = urlparse.urljoin(url, l)
+            l = l[:l.rfind('/')] + '/'
+            if url_extended == l[:l.rfind('/')] + '/':
+                result.append((elem, attr['src'].replace(' ', '%20')))
+        return result  
+    
+    def find_imgs(self, link):
+        elements, root = self._html_to_img()
+        tree = etree.ElementTree(root)
+        result = []
+        url_base = urlparse.urlparse(self.url)
+        url_base = url_base.scheme + '://' + url_base.netloc
+        url_extended = urlparse.urljoin(url_base, link)
+        url_extended = url_extended[:url_extended.rfind('/')] + '/'
+        result = self._find_img_urls(elements, url_extended, url_extended)
+        if not result:
+            result = self._find_img_urls(elements, url_base, url_extended)
+        
+        return result
+    
+    def find_img_xpath(self, link):
+        urls = self.find_imgs(link)
+        tree = etree.ElementTree(self.elem_tree)
+        for elem, url in urls:
+            if url == link:
+                return tree.getpath(elem)
+            
+    def find_img_url(self, path):
+        path += '/@src'
+        result = self.elem_tree.xpath(path)[0]
+        return result
     
     
     def _find_path(self, index, text_map, root):

@@ -5,6 +5,7 @@ class Template(models.Model):
     url_abbr = models.TextField(verbose_name='Name')
     url = models.URLField()
     desc = models.TextField(verbose_name='Description')
+    img = models.TextField(verbose_name='Image link')
     
     def __str__(self):
         return self.url_abbr
@@ -31,3 +32,16 @@ class Record(models.Model):
     
     def __str__(self):
         return str(self.pk)
+
+
+class CrawlerImg(models.Model):
+    template = models.ForeignKey(Template, default=None)
+    xpath = models.TextField()
+    url = models.TextField()
+
+'''
+class Image(models.Model):
+    record = models.ForeignKey(Record, default=None)
+    url = models.URLField()
+    path = CharField(max_lenth=200, default=None)
+'''
