@@ -23,7 +23,8 @@ class Analyzer(object) :
             url (str): e.g. http://www.etoz.ch.model-2145.
 
         Attributes:
-            r (requests.models.Response): Response fetched from url
+            url (str): Represents url.
+            r (requests.models.Response): Response fetched from url.
             elem_tree (lxml.etree._ElementTree): Parsed element tree from url.
         """
         self.url = url
@@ -34,7 +35,7 @@ class Analyzer(object) :
 
     def _html_text_recursive(self, e):
         """
-        Generates the text of elements.
+        Generates the text of an element.
 
         Args:
             e (lxml.html.HtmlElement): HtmlElement of an element tree.
@@ -62,7 +63,6 @@ class Analyzer(object) :
             body (str): string representation of HTML document.
 
         Attributes:
-            body (lxml.html.HtmlElement): HTML document containing only body
             text (str): cleand string representation of HTML document
 
         Returns:
@@ -76,15 +76,15 @@ class Analyzer(object) :
         return text
 
 
-    def _html_text_recursive_search(self, e):
+    def _html_textmap_recursive(self, e):
         """
-        Generates the text of elements.
+        Generates a mapping between element and the text of the corresponding element.
 
         Args:
             e (lxml.html.HtmlElement): HtmlElement of an element tree.
 
         Yields:
-            str: The text of the next element or a new line.
+            (lxml.html.HtmlElement, str): The element plus the text corresponding to the element or a new line.
         """
 
         if e.tag in ["script", "style"] or not isinstance(e.tag, str):
@@ -92,16 +92,17 @@ class Analyzer(object) :
         if e.tag in self.html_block_elements: yield (e, "\n")
         yield (e, e.text)
         for c in e.iterchildren():
-            for h in self._html_text_recursive_search(c):
+            for h in self._html_textmap_recursive(c):
                 yield h
             #yield from self._html_text_recursive_search(c)
         if e.tag in self.html_block_elements: yield (e, "\n")
         yield (e, e.tail)
 
 
-    def _html_to_text_search(self, html):
+    def _html_to_textmap(self, html):
+        #TODO: documentation
         """
-        Generates the text of a website by cleaning the html tags.
+        Generates the text of a website by cleaning the html tags and a mapping between element and text.
 
         Args:
             html (str): string representation of HTML document.
@@ -137,7 +138,16 @@ class Analyzer(object) :
 
         return text, text_map, d
 
-    def _html_img_recursive(self, e):
+    def _html_img_recursive(self, e): 
+        """
+        Generates the text of elements.
+
+        Args:
+            e (lxml.html.HtmlElement): HtmlElement of an element tree.
+
+        Yields:
+            str: The text of the next element or a new line.
+        """
         if e.tag in ["script", "style"] or not isinstance(e.tag, str):
             return
         if e.tag == 'img': yield (e, e.attrib)
@@ -149,6 +159,7 @@ class Analyzer(object) :
                 yield h
 
     def _html_to_img(self):
+
         body = self.elem_tree.xpath('//body')[0]
         elements = self._html_img_recursive(body)
         return elements, body
@@ -419,7 +430,7 @@ class Analyzer(object) :
             i_section ():
             i_paths ():
         """
-        text, text_map, root = self._html_to_text_search(self.r.text)
+        text, text_map, root = self._html_to_textmap(self.r.text)
         search_string = re.sub("[ \t\n]+", " ", search_string).lower()
         search_string = re.sub("[ \t\n]+$", "", search_string)
         #matches = self._find_text(text, search_string.lower())
