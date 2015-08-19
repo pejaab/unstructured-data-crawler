@@ -1,4 +1,4 @@
-import mysql.connector
+import MySQLdb 
 
 class Dao(object) :
 
@@ -6,6 +6,7 @@ class Dao(object) :
     _user = 'root'
     _passwd = 'idp2015'
     _host = '46.38.236.133'
+    #_host = 'localhost'
     _db = 'impudo'
 
     _table_template = 'interface_templateitem'
@@ -13,11 +14,11 @@ class Dao(object) :
     _table_rules = 'impudo_rules'
 
     # def __init__(self):
-    #     self.conn = mysql.connector.connect(user='root', passwd='idp2015', host='46.38.236.133', database='impudo')
+    #     self.conn = MySQLdb.connect(user='root', passwd='idp2015', host='46.38.236.133', db='impudo')
     #     self.cursor = self.conn.cursor()
 
     def __init__(self, user=_user, passwd=_passwd, host=_host, db=_db):
-        self.conn = mysql.connector.connect(user=user, passwd=passwd, host=host, database=db)
+        self.conn = MySQLdb.connect(user=user, passwd=passwd, host=host, db=db)
         self.cursor = self.conn.cursor()
 
     #get xpath for site
@@ -69,7 +70,7 @@ class Dao(object) :
         try:
             self.cursor.execute(sql)
             self.conn.commit()
-        except mysql.connector.Error as e:
+        except MySQLdb.Error as e:
             self.conn.rollback()
             print("Error %d: %s" % (e.args[0], e.args[1]))
 
@@ -77,5 +78,5 @@ class Dao(object) :
         try:
             self.cursor.execute(sql)
             return self.cursor.fetchone()
-        except mysql.connector.Error as e:
+        except MySQLdb.Error as e:
             print("Error %d: %s" % (e.args[0], e.args[1]))
