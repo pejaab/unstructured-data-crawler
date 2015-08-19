@@ -94,7 +94,7 @@ class Analyzer(object) :
         for c in e.iterchildren():
             for h in self._html_textmap_recursive(c):
                 yield h
-            #yield from self._html_text_recursive_search(c)
+            #yield from self._html_textmap_recursive(c)
         if e.tag in self.html_block_elements: yield (e, "\n")
         yield (e, e.tail)
 
@@ -122,7 +122,7 @@ class Analyzer(object) :
         html = html.replace("\r\n","\n")
         d = lxml.html.document_fromstring(html)
         body = d.xpath('//body')[0]
-        elements = list(filter(lambda x: x[1] is not None, self._html_text_recursive_search(body)))
+        elements = list(filter(lambda x: x[1] is not None, self._html_textmap_recursive(body)))
         kill_whitespace = False
         text = ""
         text_map = {}
