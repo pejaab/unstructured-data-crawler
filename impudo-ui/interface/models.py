@@ -5,7 +5,7 @@ class Template(models.Model):
     url_abbr = models.TextField(verbose_name='Name')
     url = models.URLField()
     desc = models.TextField(verbose_name='Description')
-    img = models.TextField(verbose_name='Image link')
+    img = models.TextField(verbose_name='Image Url')
     
     def __str__(self):
         return self.url_abbr

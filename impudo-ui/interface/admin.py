@@ -17,14 +17,17 @@ class RecordResource(resources.ModelResource):
 
 
 class RecordAdmin(ExportActionModelAdmin):
+    exclude = ('url',)
+    readonly_fields = ('template',)
+    fields = ('template', 'title', 'result')
+    list_display = ('title', 'result',)
     list_filter = (
-            ('template_id', admin.RelatedOnlyFieldListFilter),
+            ('template', admin.RelatedOnlyFieldListFilter),
             )
-    search_fields = ['title', 'result', 'template_id']
-    list_display = ('title', 'result', 'template_id')
+    #search_fields = ['template']
 
     resource_class = RecordResource
-
+    
 
 class CrawlerInline(admin.TabularInline):
     model = Crawler
@@ -35,8 +38,9 @@ class CrawlerInline(admin.TabularInline):
 
 
 class TemplateAdmin(admin.ModelAdmin):
-    readonly_fields = ('url_abbr', 'url', 'desc')
-    list_display = ('url_abbr', 'url', 'desc')
+    readonly_fields = ('url_abbr', 'url', 'desc', 'img',)
+    fields = ('url_abbr', 'url', 'img', 'desc')
+    list_display = ('url_abbr', 'desc',)
 
 
     inlines = [CrawlerInline,]
