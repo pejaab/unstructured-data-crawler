@@ -179,7 +179,7 @@ class Analyzer(object) :
                 result.append((elem, attr['src'].replace(' ', '%20')))
         return result  
     
-    def find_imgs(self, xpath, link):
+    def _find_imgs(self, xpath, link):
         elements, root = self._html_to_img()
         tree = etree.ElementTree(root)
         result = []
@@ -197,7 +197,7 @@ class Analyzer(object) :
         return result
     
     def find_img_xpath(self, link):
-        urls = self.find_imgs(None, link)
+        urls = self._find_imgs(None, link)
         tree = etree.ElementTree(self.elem_tree)
         for elem, url in urls:
             if url == link:
@@ -206,8 +206,18 @@ class Analyzer(object) :
     def find_img_url(self, path):
         path += '/@src'
         result = self.elem_tree.xpath(path)[0]
-        return result[0].replace(' ', '%20')
+        return result.replace(' ', '%20')
+   
     
+    def find_imgs(self, xpath, link):
+        elements = self._find_imgs(xpath, link)
+        url_base = urllib.parse.urlparse(self.url)
+        url_base = url_base.scheme + '://' + url_base.netloc
+        result = []
+        for e, url in elements:
+            result.append(urllib.parse.urljoin(url_base, url))
+        return result
+
     
     def _find_path(self, index, text_map, root):
         """
