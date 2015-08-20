@@ -39,9 +39,8 @@ class CrawlerImg(models.Model):
     xpath = models.TextField()
     url = models.TextField()
 
-'''
+
 class Image(models.Model):
     record = models.ForeignKey(Record, default=None)
-    url = models.URLField()
-    path = CharField(max_lenth=200, default=None)
-'''
+    path = models.FileField(upload_to='.')
+

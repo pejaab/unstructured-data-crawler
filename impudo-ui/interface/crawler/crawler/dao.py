@@ -5,12 +5,15 @@ class Dao(object) :
     #default database configuration
     _user = 'root'
     _passwd = 'idp2015'
-    _host = '46.38.236.133'
-    #_host = 'localhost'
+    #_host = '46.38.236.133'
+    _host = 'localhost'
     _db = 'impudo'
 
-    _table_template = 'interface_templateitem'
+    _table_template = 'interface_template'
     _table_record = 'interface_record'
+    _table_image = 'interface_image'
+    _table_crawlerimg = 'interface_crawlerimg'
+    _table_crawler = 'interface_crawler'
     _table_rules = 'impudo_rules'
 
     # def __init__(self):
@@ -27,21 +30,25 @@ class Dao(object) :
     #    self.cursor.execute(sql)
     #    return self.cursor
 
-    def get_path(self, template_id):
-        sql = 'SELECT xpath from interface_crawler where template_id={0} and active = 1 order by id asc'.format(template_id)
+    def get_desc_xpath(self, template_id):
+        sql = 'SELECT xpath from {0} where template_id={1} and active = 1 order by id asc'.format(self._table_crawler, template_id)
         self.cursor.execute(sql)
-        return self.cursor    
+        return self.cursor
+
+    def get_img_xpath(self, template_id):
+        sql = 'SELECT xpath from {0} where template_id={1}'.format(self._table_crawlerimg, template_id)
+        return self.query_sql(sql)
 
     def get_rules(self, url):
-        sql = 'SELECT follow_rules, parse_rules, follow_rules_deny, parse_rules_deny from impudo_rules where domain = "{0}" limit 1'.format(url)
+        sql = 'SELECT follow_rules, parse_rules, follow_rules_deny, parse_rules_deny from {0} where domain = "{1}" limit 1'.format(self._table_rules, url)
         return self.query_sql(sql)
 
     def get_url(self, template_id):
-        sql = 'SELECT url from interface_template where id={0}'.format(template_id)
+        sql = 'SELECT url from {0} where id={1}'.format(self._table_template, template_id)
         return self.query_sql(sql)
 
-    def insert_picture(self, url, path, record_id):
-        sql = "INSERT INTO interface_pictures (url, path, record_id) VALUES ('{0}', '{1}', {2})".format(url, path, record_id)
+    def insert_image(self, url, path, record_id):
+        sql = "INSERT INTO {0} (url, path, record_id) VALUES ('{1}', '{2}', {3})".format(self._table_image, url, path, record_id)
         self.execute_sql(sql)
 
     def get_last_insert_id(self):
@@ -60,6 +67,10 @@ class Dao(object) :
         title = title.replace('\'', '\'\'')
 
         sql = "INSERT INTO {0} (title, url, result, template_id) VALUES ('{1}', '{2}', '{3}',{4})".format(self._table_record, title, url, result, template_id)
+        self.execute_sql(sql)
+
+    def insert_image(self, path, record_id):
+        sql = "INSERT INTO {0} (path, record_id) VALUES ('{1}', {2})".format(self._table_image, path, record_id)
         self.execute_sql(sql)
 
     def insert_rule(self,domain, follow_rules, parse_rules, follow_rules_deny, parse_rules_deny):
