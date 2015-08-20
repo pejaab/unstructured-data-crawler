@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block links %}
-  <a class="navbar-brand" href='#'>Manage Crawler</a> 
-  <a class="navbar-brand" href='#'>Create Crawler</a>
+<a class="navbar-brand" href="{% url 'admin:index' %}">Manage Crawler</a> 
+<a class="navbar-brand" href="{% url 'home' %}">Create Crawler</a>
 {% endblock %}
 {% block header_text %}Crawler: {{ item.url_abbr }}{% endblock %}
 {% block table %}
