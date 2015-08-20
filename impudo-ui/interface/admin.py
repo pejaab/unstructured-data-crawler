@@ -22,11 +22,11 @@ class RecordAdmin(ExportActionModelAdmin):
     exclude = ('url',)
     readonly_fields = ('template',)
     fields = ('template', 'title', 'result')
-    list_display = ('title', 'result',)
+    list_display = ('title', 'result', 'template')
     list_filter = (
             ('template', admin.RelatedOnlyFieldListFilter),
             )
-    #search_fields = ['template']
+    search_fields = ['template__id', 'template__url_abbr']
 
     resource_class = RecordResource
     
