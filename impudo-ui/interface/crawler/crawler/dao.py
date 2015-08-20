@@ -18,7 +18,7 @@ class Dao(object) :
     #     self.cursor = self.conn.cursor()
 
     def __init__(self, user=_user, passwd=_passwd, host=_host, db=_db):
-        self.conn = MySQLdb.connect(user=user, passwd=passwd, host=host, db=db)
+        self.conn = MySQLdb.connect(user=user, passwd=passwd, host=host, db=db, use_unicode=True, charset='utf8')
         self.cursor = self.conn.cursor()
 
     #get xpath for site

@@ -53,7 +53,7 @@ class TemplateAdmin(admin.ModelAdmin):
     def dispatch_crawler(self, request, queryset):
         for item in queryset:
             scrape.delay(item.id)
-    dispatch_crawler.short_description = "Dispatch the crawler for this template"
+    dispatch_crawler.short_description = "Dispatch crawler for this template"
 
 admin_site = AdminSite(name='admin')
 admin_site.register(Template, TemplateAdmin)
