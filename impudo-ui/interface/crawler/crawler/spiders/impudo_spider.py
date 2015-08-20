@@ -75,6 +75,7 @@ class ImpudoSpider(CrawlSpider):
 		content = ""
 
 		title = response.xpath("/html/head/title/text()").extract()[0]
+                title = re.sub("[ \t]+", " ", title).strip()
 		url = response.url
 
 		for xp in self.xpaths:
