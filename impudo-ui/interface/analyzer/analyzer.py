@@ -207,6 +207,10 @@ class Analyzer(object) :
         path += '/@src'
         result = self.elem_tree.xpath(path)[0]
         return result.replace(' ', '%20')
+
+    def _url_exists(self, url):
+        r = requests.get(url)
+        return (r.status_code == 200)
    
     
     def find_imgs(self, xpath, link):
@@ -215,7 +219,9 @@ class Analyzer(object) :
         url_base = url_base.scheme + '://' + url_base.netloc
         result = []
         for e, url in elements:
-            result.append(urllib.parse.urljoin(url_base, url))
+            u = urllib.parse.urljoin(url_base, url)
+            if self._url_exists(u):
+                result.append(u)
         return result
 
     
