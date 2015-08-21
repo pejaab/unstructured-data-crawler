@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.models import Group, User
 from django.db import models
 from django.forms import TextInput, Textarea
-from interface.models import Crawler, Record, Template
+from interface.models import Crawler, Record, Template, Image
 from import_export import resources
 from import_export.admin import ExportActionModelAdmin
 from interface.tasks import scrape
@@ -17,6 +17,14 @@ class RecordResource(resources.ModelResource):
     class Meta:
         model = Record
 
+class ImageInline(admin.TabularInline):
+    model = Image
+    extra = 0
+    exclude = ('id', 'path',)
+    max_num = 0
+    readonly_fields = ('img',)
+    fields = ('img',)
+
 
 class RecordAdmin(ExportActionModelAdmin):
     exclude = ('url',)
@@ -27,6 +35,7 @@ class RecordAdmin(ExportActionModelAdmin):
             ('template', admin.RelatedOnlyFieldListFilter),
             )
     search_fields = ['template__id', 'template__url_abbr']
+    inlines = [ImageInline,]
 
     resource_class = RecordResource
     

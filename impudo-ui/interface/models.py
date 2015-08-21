@@ -1,6 +1,10 @@
 from django.core.urlresolvers import reverse
 from django.db import models
 
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 class Template(models.Model):
     url_abbr = models.TextField(verbose_name='Name')
     url = models.URLField()
@@ -50,3 +54,12 @@ class Image(models.Model):
     record = models.ForeignKey(Record, default=None)
     path = models.CharField(max_length=500)
 
+    def img(self):
+        path = os.path.join(os.path.dirname(BASE_DIR), 'media')
+        return u'<img src="../../../../media/%s" width="100"/>' % (self.path)
+    img.short_description = 'Image'
+    img.allow_tags = True
+
+    def __str__(self):
+        return str(self.pk)
+    
