@@ -180,11 +180,11 @@ class Analyzer(object) :
         return result  
     
     def _find_imgs(self, xpath, link):
-        elements, root = self._html_to_img()
-        tree = etree.ElementTree(root)
+        elements, _ = self._html_to_img()
+        elements = list(elements)
         result = []
         if xpath:
-            link = self.find_img(xpath)
+            link = self.find_img_url(xpath)
 
         url_base = urlparse.urlparse(self.url)
         url_base = url_base.scheme + '://' + url_base.netloc
@@ -213,13 +213,13 @@ class Analyzer(object) :
         return (r.status_code == 200)
    
     
-    def find_imgs(self, xpath, link):
-        elements = self._find_imgs(xpath, link)
-        url_base = urllib.parse.urlparse(self.url)
+    def find_imgs(self, xpath):
+        elements = self._find_imgs(xpath, None)
+        url_base = urlparse.urlparse(self.url)
         url_base = url_base.scheme + '://' + url_base.netloc
         result = []
         for e, url in elements:
-            u = urllib.parse.urljoin(url_base, url)
+            u = urlparse.urljoin(url_base, url)
             if self._url_exists(u):
                 result.append(u)
         return result
