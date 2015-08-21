@@ -107,15 +107,8 @@ class ImpudoSpider(CrawlSpider):
 			p['title'] = title
 			p['content'] = content
 			p['url'] = response.url
-			#yield p 
-			self.dao.insert_record(title, response.url, content, self.template_id)
-                        
-                        record_id = self.dao.get_last_insert_id()[0]
-                        #TODO: download image and put path not image url into database
-                        filename = img[img.rfind('/')+1:]
-                        for img in image_urls:
-                            self.dao.insert_image(img.encode('utf-8'), record_id, filename)
-
+                        p['image_urls'] = image_urls
+			yield p 
 		else:
 			self.logger.warning('No content found on %s in domain %s', response.url, self.allowed_domains[0])
 

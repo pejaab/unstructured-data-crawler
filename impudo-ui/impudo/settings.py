@@ -111,3 +111,5 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.abspath(os.path.join(BASE_DIR, '../media'))
 
 DAB_FIELD_RENDERER = 'django_admin_bootstrapped.renderers.BootstrapFieldRenderer'
+
+os.environ['SCRAPY_SETTINGS_MODULE'] = 'interface.crawler.crawler.settings'

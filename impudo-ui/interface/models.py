@@ -41,7 +41,12 @@ class CrawlerImg(models.Model):
 
 
 class Image(models.Model):
-    filename = models.CharField(max_length=200, default=None)
+    '''
+    # after: https://docs.djangoproject.com/en/dev/ref/models/fields/#django.db.models.FileField.upload%5Fto
+    # and: http://stackoverflow.com/questions/1190697/django-filefield-with-upload-to-determined-at-runtime
+    def directory_path(self, filename):
+        return 'template_{0}/record_{1}/{2}'.format()
+    '''
     record = models.ForeignKey(Record, default=None)
-    path = models.FileField(upload_to='.')
+    path = models.CharField(max_length=500)
 

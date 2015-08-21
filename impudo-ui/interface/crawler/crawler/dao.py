@@ -69,8 +69,8 @@ class Dao(object) :
         sql = "INSERT INTO {0} (title, url, result, template_id) VALUES ('{1}', '{2}', '{3}',{4})".format(self._table_record, title, url, result, template_id)
         self.execute_sql(sql)
 
-    def insert_image(self, path, record_id, filename):
-        sql = "INSERT INTO {0} (path, record_id, filename) VALUES ('{1}', {2}, '{3}')".format(self._table_image, path, record_id, filename)
+    def insert_image(self, path, record_id):
+        sql = "INSERT INTO {0} (path, record_id) VALUES ('{1}', {2})".format(self._table_image, path, record_id)
         self.execute_sql(sql)
 
     def insert_rule(self,domain, follow_rules, parse_rules, follow_rules_deny, parse_rules_deny):
