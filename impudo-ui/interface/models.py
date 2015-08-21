@@ -41,6 +41,7 @@ class CrawlerImg(models.Model):
 
 
 class Image(models.Model):
+    filename = models.CharField(max_length=200, default=None)
     record = models.ForeignKey(Record, default=None)
     path = models.FileField(upload_to='.')
 

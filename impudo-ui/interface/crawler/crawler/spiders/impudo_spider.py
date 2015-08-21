@@ -37,11 +37,14 @@ class ImpudoSpider(CrawlSpider):
 		self.start_urls=[]
 		self.start_urls.append(o.scheme+"://"+o.netloc+"/")
 
-		#get xpaths
-		result = self.dao.get_path(self.template_id)
-		self.xpaths = []
+		#get desc xpaths
+		result = self.dao.get_desc_xpath(self.template_id)
+		self.desc_xpaths = []
 		for (xpath)  in result:
-			self.xpaths.append(xpath[0])
+			self.desc_xpaths.append(xpath[0])
+
+                #get img xpath
+                self.img_xpath = self.dao.get_img_xpath(self.template_id)[0]
 
 		#get and set rules for specific domain if they exist in the db
 		textrules = self.dao.get_rules(self.allowed_domains[0])
@@ -78,7 +81,7 @@ class ImpudoSpider(CrawlSpider):
                 title = re.sub("[ \t]+", " ", title).strip()
 		url = response.url
 
-		for xp in self.xpaths:
+		for xp in self.desc_xpaths:
 			tempcont = a.find_content(xp)
 
 			if tempcont:
@@ -87,6 +90,12 @@ class ImpudoSpider(CrawlSpider):
 		#ignore if no content is found
 		if content:
 			print title.encode('utf-8'), response.url, content.encode('utf-8')
+                        
+                        # get image urls
+                        image_urls = []
+                        for img in a.find_imgs(self.img_xpath):
+                            print(img)
+                            image_urls.append(img)
 
 			#convert to utf8
 			title = title.encode('utf-8')
@@ -98,9 +107,15 @@ class ImpudoSpider(CrawlSpider):
 			p['title'] = title
 			p['content'] = content
 			p['url'] = response.url
-			p['image_urls'] = []
 			#yield p 
 			self.dao.insert_record(title, response.url, content, self.template_id)
+                        
+                        record_id = self.dao.get_last_insert_id()[0]
+                        #TODO: download image and put path not image url into database
+                        filename = ''
+                        for img in image_urls:
+                            self.dao.insert_image(img.encode('utf-8'), record_id, filename)
+
 		else:
 			self.logger.warning('No content found on %s in domain %s', response.url, self.allowed_domains[0])
 
