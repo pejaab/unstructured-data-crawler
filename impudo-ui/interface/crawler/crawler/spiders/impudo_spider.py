@@ -112,7 +112,7 @@ class ImpudoSpider(CrawlSpider):
                         
                         record_id = self.dao.get_last_insert_id()[0]
                         #TODO: download image and put path not image url into database
-                        filename = ''
+                        filename = img[img.rfind('/')+1:]
                         for img in image_urls:
                             self.dao.insert_image(img.encode('utf-8'), record_id, filename)
 
