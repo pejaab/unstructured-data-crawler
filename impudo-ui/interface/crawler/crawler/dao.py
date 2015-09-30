@@ -11,6 +11,7 @@ class Dao(object) :
 
     _table_template = 'interface_template'
     _table_record = 'interface_record'
+    _table_record_details = 'interface_record_details'
     _table_image = 'interface_image'
     _table_crawlerimg = 'interface_crawlerimg'
     _table_crawler = 'interface_crawler'
@@ -67,6 +68,10 @@ class Dao(object) :
         title = title.replace('\'', '\'\'')
 
         sql = "INSERT INTO {0} (title, url, result, template_id) VALUES ('{1}', '{2}', '{3}',{4})".format(self._table_record, title, url, result, template_id)
+        self.execute_sql(sql)
+
+    def insert_record_details(self, id, price, dimensions):
+        sql = "INSERT INTO {0} (id, price, dimensions) VALUES ({1}, '{2}','{3}')".format(self._table_record_details, id, price, dimensions)
         self.execute_sql(sql)
 
     def insert_image(self, path, record_id):
