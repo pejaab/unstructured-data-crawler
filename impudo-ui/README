@@ -1,5 +1,5 @@
-Installation of mysql-connector:
-- git clone https://github.com/multiplay/mysql-connector-python
-- python setup.py build
-- python setup.py install
-
+Requirements to start application:
+- MySQL server running: mysql.server start
+- RabbitMQ running: sudo rabbitmq-server (sudo rabbitmqctl stop)
+  http://docs.celeryproject.org/en/latest/getting-started/brokers/rabbitmq.html#broker-rabbitmq
+- Celery running: celery -A impudo worker -l info

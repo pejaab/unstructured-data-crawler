@@ -92,12 +92,11 @@ class ImpudoImagesPipeline(ImagesPipeline):
 		for a in x[1]:
 			founddims += "".join(a.split()) + " " 
 		founddims = founddims.strip()
-
-		self.d.insert_record_details(id,foundprices,founddims)
+                
+                return foundprices, founddims
 
 	def save_item_in_db(self, item):
 		#insert record
-		self.d.insert_record(item['title'], item['url'], item['content'], item['template_id'])
 		record_id = self.d.get_last_insert_id()[0]
 
 		image_urls = item['image_urls']
@@ -107,5 +106,6 @@ class ImpudoImagesPipeline(ImagesPipeline):
 			self.d.insert_image(img, record_id)
 
 		#extract and save details (prices, dimensions, ...)
-		self.extract_and_save_details(record_id,item['title'],item['content'])
+		foundprices, founddims = self.extract_and_save_details(record_id,item['title'],item['content'])
 		
+		self.d.insert_record(item['title'], item['url'], item['content'], item['template_id'], foundprices, founddims)

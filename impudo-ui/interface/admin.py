@@ -29,8 +29,8 @@ class ImageInline(admin.TabularInline):
 class RecordAdmin(ExportActionModelAdmin):
     exclude = ('url',)
     readonly_fields = ('template',)
-    fields = ('template', 'title', 'result')
-    list_display = ('title', 'result', 'template')
+    fields = ('template', 'title', 'result', 'price', 'dimensions')
+    list_display = ('title', 'result', 'price', 'dimensions', 'template')
     list_filter = (
             ('template', admin.RelatedOnlyFieldListFilter),
             )

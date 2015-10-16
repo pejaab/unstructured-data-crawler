@@ -33,6 +33,8 @@ class Record(models.Model):
     title = models.CharField(max_length=200, default=None)
     url = models.URLField()
     result = models.TextField()
+    price = models.CharField(max_length=100, blank=True)
+    dimensions = models.CharField(max_length=100, blank=True)
     
     def __str__(self):
         return str(self.pk)

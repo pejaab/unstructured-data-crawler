@@ -63,15 +63,11 @@ class Dao(object) :
         sql = 'UPDATE {0} SET path="{1}" where id={2}'.format(self._table_template, path, id)
         self.execute_sql(sql) '''
 
-    def insert_record(self, title, url, result, template_id):
+    def insert_record(self, title, url, result, template_id, price, dimensions):
         result = result.replace('\'', '\'\'')
         title = title.replace('\'', '\'\'')
 
-        sql = "INSERT INTO {0} (title, url, result, template_id) VALUES ('{1}', '{2}', '{3}',{4})".format(self._table_record, title, url, result, template_id)
-        self.execute_sql(sql)
-
-    def insert_record_details(self, id, price, dimensions):
-        sql = "INSERT INTO {0} (id, price, dimensions) VALUES ({1}, '{2}','{3}')".format(self._table_record_details, id, price, dimensions)
+        sql = "INSERT INTO {0} (title, url, result, template_id, price, dimensions) VALUES ('{1}', '{2}', '{3}',{4}, '{5}', '{6}')".format(self._table_record, title, url, result, template_id, price, dimensions)
         self.execute_sql(sql)
 
     def insert_image(self, path, record_id):
