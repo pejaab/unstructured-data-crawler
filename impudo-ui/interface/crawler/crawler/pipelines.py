@@ -48,15 +48,20 @@ class ImpudoImagesPipeline(ImagesPipeline):
 
 		#to match dimensions in text
 		lnum = r"""(?:[0-9]*\,[0-9]+|[0-9]*\.[0-9]+|[0-9]+)"""
+		#shorthand for Depth, Width, Height, Hoehe, Lange, Tiefe, Breite
 		lwh = r"""(?:d|D|w|W|h|H|T|t|L|B)"""
-		lunit = r"""(?:mm|cm|dm|"|’’|'|’|'')"""
+		lunit = r"""(?:mm|cm|dm)"""
+		lunit2 = r"""(?:"|’’|'')"""
 
 		#dimmatch = "("+lnum + r"[ \t]?x[ \t]?"+lnum  + r"(?:[ \t]?x[ \t]?" +lnum+ r")?" +"|"+lnum+ r"[ \t]*"+lwh+r"*[ \t]*"+lunit+"|"+lnum+lwh+"|"+r"\b"+lwh+ r"(\:|\.)?[ \t]*"+lnum+ r"[ \t]?"+lunit+"?" +")" 
-		dimmatch = "("+lnum +r"[ \t]?" +lunit+"?" + r"[ \t]?x[ \t]?"+lnum +r"[ \t]?" +lunit+"?" + r"(?:[ \t]?x[ \t]?" +lnum +r"[ \t]?" +lunit+"?" + r")?" +"|"+lnum+ r"[ \t]*"+lwh+r"*[ \t]*"+lunit+"|"+lnum+lwh+"|"+r"\b"+lwh+ r"(\:|\.)?[ \t]*"+lnum+ r"[ \t]?"+lunit+"?" +")" 
+		dimmatch = "("+lnum +lwh+"?" +r"[ \t]?" +lunit+"?" + r"[ \t]?x[ \t]?"+lnum +lwh+"?"+r"[ \t]?" +lunit+"?" + r"(?:[ \t]?x[ \t]?" +lnum +lwh+"?"+r"[ \t]?" +lunit+"?" + r")?" +"|"+lnum+ r"[ \t]?"+lwh+r"?[ \t]?"+lunit+"|"+r"\b"+lwh+ r"(\:|\.)[ \t]*"+lnum+ r"[ \t]?"+lunit +"?"+"|"+r"\b"+lnum+r"[ \t]?"+lunit2+")" 
 
+		#remove quotation marks
+		mtext = text.replace("\'","").replace("’","").replace("`","").replace("´","")
+		
 		moneymatches = []
 
-		for r in re.findall(moneymatch,text,re.IGNORECASE):
+		for r in re.findall(moneymatch,mtext,re.IGNORECASE):
 			if r:
 				moneymatches.append(r)
 
