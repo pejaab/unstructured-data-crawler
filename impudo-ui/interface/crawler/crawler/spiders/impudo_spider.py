@@ -54,12 +54,21 @@ class ImpudoSpider(CrawlSpider):
 			parses = tuple(textrules[1].split(','))
 			follow_denies = tuple(textrules[2].split(','))
 			parse_denies = tuple(textrules[3].split(','))
+			xpath_follow_restrict = textrules[4]
 
-			ImpudoSpider.rules = (
-				Rule(LinkExtractor(allow=follows, deny=follow_denies), follow=True),
-				Rule(LinkExtractor(allow=parses, deny=parse_denies), callback='parse_product'),
+			#If xpath_restrictions exist
+			if xpath_follow_restrict:
+				ImpudoSpider.rules = (
+					Rule(LinkExtractor(allow=follows, deny=follow_denies, restrict_xpaths=(xpath_follow_restrict)), follow=True),
+					Rule(LinkExtractor(allow=parses, deny=parse_denies), callback='parse_product'),
 
-			)
+				)
+			else:
+				ImpudoSpider.rules = (
+					Rule(LinkExtractor(allow=follows, deny=follow_denies), follow=True),
+					Rule(LinkExtractor(allow=parses, deny=parse_denies), callback='parse_product'),
+
+				)
 		else:
 			#follow all links
 			ImpudoSpider.rules = (

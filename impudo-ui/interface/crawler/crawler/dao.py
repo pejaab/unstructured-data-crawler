@@ -41,7 +41,7 @@ class Dao(object) :
         return self.query_sql(sql)
 
     def get_rules(self, url):
-        sql = 'SELECT follow_rules, parse_rules, follow_rules_deny, parse_rules_deny from {0} where domain = "{1}" limit 1'.format(self._table_rules, url)
+        sql = 'SELECT follow_rules, parse_rules, follow_rules_deny, parse_rules_deny, follow_xpath_restrict from {0} where domain = "{1}" limit 1'.format(self._table_rules, url)
         return self.query_sql(sql)
 
     def get_url(self, template_id):
