@@ -246,21 +246,6 @@ class Analyzer(object) :
         tree = etree.ElementTree(root)
         return tree.getpath(text_map[index])
 
-    """
-    def _common(self, path_b, path_e):
-        '''
-        Copmutes the common part of the path between path_b and path_e.
-        '''
-        s = difflib.SequenceMatcher(None, path_b, path_e)
-        t = s.get_matching_blocks()[0]
-        path = path_b[:t.size]
-        # if matching stop in '[]' or at '/' the output needs to 
-        # be cleaned of open [ or /
-        if path[-1] == '[' or '/':
-            return path[:path.rfind('/')]
-        else:
-            return path
-    """
 
     def find_content(self, path):
         """
@@ -285,36 +270,6 @@ class Analyzer(object) :
                 return ''
             return self._html_to_text(result)
 
-    """
-    def _find_text(self, text, search_string):
-        '''
-        Finds matchings between a search_string and a website text.
-        '''
-        s = difflib.SequenceMatcher(None, search_string, text)
-        m = s.get_matching_blocks()
-        m2 = m
-        m3 = m
-        while len(m) == len(m2):
-            l = m2[0].b + m2[0].size
-            t = ' ' * (l) + text[l:]
-            s.set_seq2(t)
-            m2 = s.get_matching_blocks()
-            m3 += m2
-        return set(m3)
-    
-
-    def _find_paths(self, matches, text_map, root):
-        '''
-        Find all paths that matches where found for.
-        '''
-        paths = []
-        for match in matches:
-            # tuple of the beginning of the match and the end of the match so the common path
-            # can be computed
-            paths.append((self._find_path(match.b, text_map, root), 
-                         self._find_path(match.b+match.size, text_map, root)))
-        return paths
-    """
         
     def _find_paths(self, matches, t_length, text_map, root):
         '''
