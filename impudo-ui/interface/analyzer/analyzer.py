@@ -224,6 +224,15 @@ class Analyzer(object) :
                 result.append(u)
         return result
 
+    def _find_all_paths(self, text_map, root):
+
+        result = []
+        tree = etree.ElementTree(root)
+        for _,item in text_map.items():
+            path = tree.getpath(item)
+            result.append(tree.getpath(item))
+
+        return result
     
     def _find_path(self, index, text_map, root):
         """
@@ -389,7 +398,7 @@ class Analyzer(object) :
 
         return diff, i_section        
 
-    def analyze(self, search_string):
+    def analyze(self, search_string=None):
         """
         Analyzes a websites content to find xpaths that reference the search_string.
 
@@ -405,12 +414,17 @@ class Analyzer(object) :
             i_paths ():
         """
         text, text_map, root = self._html_to_textmap(self.r.text)
-        search_string = re.sub("[ \t\n]+", " ", search_string).lower()
-        search_string = re.sub("[ \t\n]+$", "", search_string)
-        #matches = self._find_text(text, search_string.lower())
-        diff, i_section = self._find_text(text, search_string)
-        #d_paths = self._find_paths(diff, text_map, root)
-        i_paths = self._find_paths(i_section, len(text), text_map, root)
+        i_paths = []
+        if not search_string:
+            ordered_text_map = collections.OrderedDict(sorted(text_map.items()))
+            i_paths = self._find_all_paths(ordered_text_map, root)
+        else:
+            search_string = re.sub("[ \t\n]+", " ", search_string).lower()
+            search_string = re.sub("[ \t\n]+$", "", search_string)
+            #matches = self._find_text(text, search_string.lower())
+            diff, i_section = self._find_text(text, search_string)
+            #d_paths = self._find_paths(diff, text_map, root)
+            i_paths = self._find_paths(i_section, len(text), text_map, root)
         return i_paths
         '''
         result = []

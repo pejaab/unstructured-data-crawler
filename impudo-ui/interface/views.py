@@ -25,7 +25,7 @@ def view_template(request, template_id):
                 record.save()
 
             # Only active records are kept in database 
-            Crawler.objects.filter(template_id=template_id, active=0).delete() 
+            Crawler.objects.filter(template_id=template_id, active=1).delete() 
 
             if 'dispatch' in request.POST:
                 #TODO: redirect to manage page
