@@ -5,8 +5,8 @@ class Dao(object) :
     #default database configuration
     _user = 'root'
     _passwd = 'idp2015'
-    _host = '46.38.236.133'
-    #_host = 'localhost'
+    #_host = '46.38.236.133'
+    _host = 'localhost'
     _db = 'impudo'
 
     _table_template = 'interface_template'
@@ -32,7 +32,7 @@ class Dao(object) :
     #    return self.cursor
 
     def get_desc_xpath(self, template_id):
-        sql = 'SELECT xpath from {0} where template_id={1} and active = 1 order by id asc'.format(self._table_crawler, template_id)
+        sql = 'SELECT xpath from {0} where template_id={1} order by id asc'.format(self._table_crawler, template_id)
         self.cursor.execute(sql)
         return self.cursor
 

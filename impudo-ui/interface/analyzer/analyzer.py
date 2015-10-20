@@ -5,6 +5,7 @@ import re
 import difflib
 import requests
 import urlparse
+import collections
 
 class Analyzer(object) :
 
@@ -434,3 +435,25 @@ class Analyzer(object) :
                 result.append(path)
         '''
         #return result
+
+
+    def eliminate_xpaths(self, stored_xpaths, found_xpaths):
+
+        for path in stored_xpaths:
+            try:
+                found_xpaths.remove(path)
+            except ValueError as _:
+                pass
+
+        result = []
+
+        for path in found_xpaths:
+            if path not in result:
+                result.append(path)
+                new_path = path
+                while new_path:
+                    new_path = new_path[:new_path.rfind('/')]
+                    if new_path in result:
+                        result.remove(path)
+
+        return result

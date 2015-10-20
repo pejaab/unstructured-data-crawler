@@ -24,8 +24,10 @@ def view_template(request, template_id):
                 record.active = 1
                 record.save()
 
-            # Only active records are kept in database 
-            Crawler.objects.filter(template_id=template_id, active=1).delete() 
+            # Only inactive records are kept in database 
+            active_paths = list(Crawler.objects.filter(template_id=template_id, active=1))
+            Crawler.objects.filter(template_id=template_id).delete()
+            form.save_inactive_records(active_paths)
 
             if 'dispatch' in request.POST:
                 #TODO: redirect to manage page

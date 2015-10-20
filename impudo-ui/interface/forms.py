@@ -65,3 +65,16 @@ class TemplateForm(forms.models.ModelForm):
             Crawler.objects.create(template= self.instance, xpath= path, content= analyzer.find_content(path), url= url)
 
         CrawlerImg.objects.create(template= self.instance, xpath= img_path, url= analyzer.find_img_url(img_path))
+
+    def save_inactive_records(self, active):
+        url = self['url'].value()
+        analyzer = Analyzer(url)
+        all_paths = analyzer.analyze()
+        for crawler in active:
+            try:
+                all_paths.remove(crawler.xpath)
+            except ValueError as _:
+                pass
+
+        for path in all_paths:
+            Crawler.objects.create(template= self.instance, xpath=path, content= analyzer.find_content(path), url= url)

@@ -89,8 +89,11 @@ class ImpudoSpider(CrawlSpider):
 		title = response.xpath("/html/head/title/text()").extract()[0]
                 title = re.sub("[ \t]+", " ", title).strip()
 		url = response.url
+                
+                found_xpaths = a.analyze()
+                xpaths_to_use = a.eliminate_xpaths(self.desc_xpaths, found_xpaths)
 
-		for xp in self.desc_xpaths:
+		for xp in xpaths_to_use:
 			tempcont = a.find_content(xp)
 
 			if tempcont:
