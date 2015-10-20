@@ -1,5 +1,5 @@
 Requirements to start application:
 - MySQL server running: mysql.server start
-- RabbitMQ running: sudo rabbitmq-server (sudo rabbitmqctl stop)
+- RabbitMQ running: sudo rabbitmq-server -detached (sudo rabbitmqctl stop)
   http://docs.celeryproject.org/en/latest/getting-started/brokers/rabbitmq.html#broker-rabbitmq
 - Celery running: celery -A impudo worker -l info
