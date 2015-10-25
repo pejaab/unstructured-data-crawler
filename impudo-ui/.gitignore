@@ -6,3 +6,4 @@ change_form.html
 interface/templates/base_site.html
 interface/templates/template_css.html
 interface/migrations/
+*.ipynb
