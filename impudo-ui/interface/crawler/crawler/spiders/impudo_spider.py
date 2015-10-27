@@ -1,6 +1,6 @@
 import os 
 import sys
-
+import ast
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -38,11 +38,28 @@ class ImpudoSpider(CrawlSpider):
 		self.start_urls.append(o.scheme+"://"+o.netloc+"/")
 
 		#get desc xpaths
-		result = self.dao.get_desc_xpath(self.template_id)
+		result = self.dao.get_desc_xpath(self.template_id, active=1)
 		self.desc_xpaths = []
-		for (xpath)  in result:
-			self.desc_xpaths.append(xpath[0])
+		for xpath  in result:
+			self.desc_xpaths.append(ast.literal_eval(xpath[0]))
 
+                #get all other xpaths
+                result = self.dao.get_desc_xpath(self.template_id, active=0)
+                self.not_desc_xpaths = []
+                for xpath in result:
+                    self.not_desc_xpaths.append(ast.literal_eval(xpath[0]))
+
+                result = self.dao.get_content(self.template_id, active=0)
+                self.not_desc_contents = []
+                for content in result:
+                    self.not_desc_contents.append(content[0])
+                
+                self.xpath_begin = ast.literal_eval(list(self.dao.get_desc_xpath(self.template_id, active=2))[0][0])
+                self.content_begin = list(self.dao.get_content(self.template_id, active=2))[0][0]
+                self.xpath_end = ast.literal_eval(list(self.dao.get_desc_xpath(self.template_id, active=3))[0][0])
+                self.content_end = list(self.dao.get_content(self.template_id, active=3))[0][0]
+                
+                
                 #get img xpath
                 self.img_xpath = self.dao.get_img_xpath(self.template_id)[0]
 
@@ -90,18 +107,43 @@ class ImpudoSpider(CrawlSpider):
                 title = re.sub("[ \t]+", " ", title).strip()
 		url = response.url
                 
-                found_xpaths = a.analyze()
-                xpaths_to_use = a.eliminate_xpaths(self.desc_xpaths, found_xpaths)
-
-		for xp in xpaths_to_use:
-			tempcont = a.find_content(xp)
+		for path in self.desc_xpaths:
+                        print(path)
+                        print(response.url)
+                        #TODO: find endless loop in find_content -> probably in search?
+			tempcont = a.find_content(path)
 
 			if tempcont:
 				content += ' ' + tempcont
-
+                print(content)
 		#ignore if no content is found
 		if content:
-			print title.encode('utf-8'), response.url, content.encode('utf-8')
+                        found_xpaths = a.analyze()
+                        check = a.eliminate_begin_and_end(found_xpaths, (self.xpath_begin, self.content_begin), (self.xpath_end, self.content_end))
+                        if not check:
+                            found_xpaths = self.desc_xpaths
+                        print(found_xpaths)
+                        print('#'*20)
+                        result = ''
+                        for xp in found_xpaths:
+                            tempcont = a.find_content(xp)
+
+                            if tempcont:
+                                result += ' ' + tempcont
+                        
+                        '''
+                        contains_paths = False
+                        for path in self.desc_xpaths:
+                            if path in xpaths_to_use:
+                                contains_paths = True
+
+                            if contains_paths:
+                                break
+
+                        if not contains_paths:
+                            result = content
+                        '''
+			print title.encode('utf-8'), response.url, result.encode('utf-8')
                         
                         # get image urls
                         image_urls = []
@@ -111,7 +153,7 @@ class ImpudoSpider(CrawlSpider):
 
 			#convert to utf8
 			title = title.encode('utf-8')
-			content = content.encode('utf-8')
+			content = result.encode('utf-8')
 			
 
 			p = Product()

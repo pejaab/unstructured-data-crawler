@@ -33,7 +33,7 @@ class Analyzer(object) :
         self.r.raise_for_status()
         self.elem_tree = lxml.html.document_fromstring(self.r.text)
         self.check_list = []
-           
+
 
     def _html_text_recursive(self, e):
         """
@@ -112,8 +112,8 @@ class Analyzer(object) :
         Attributes:
             d (lxml.html.HtmlElement): HTML document
             body (lxml.html.HtmlElement): HTML document containing only body
-            elements (): 
-            kill_whitespace (boolean): 
+            elements ():
+            kill_whitespace (boolean):
             text (str): cleand string representation of HTML document
             text_map ():
 
@@ -129,7 +129,7 @@ class Analyzer(object) :
         text_map = {}
         for e,t in elements:
             t = re.sub("[ \r\t\n\\xa0]+", " ", t)
-            if kill_whitespace:          
+            if kill_whitespace:
                 t = re.sub("^ +", "", t)
             if not t:
                 continue
@@ -140,7 +140,7 @@ class Analyzer(object) :
         return text, text_map
 
 
-    def _html_img_recursive(self, e): 
+    def _html_img_recursive(self, e):
         """
         Generates the text of elements.
 
@@ -179,8 +179,8 @@ class Analyzer(object) :
             l = l[:l.rfind('/')] + '/'
             if url_extended == l[:l.rfind('/')] + '/':
                 result.append((elem, attr['src'].replace(' ', '%20')))
-        return result  
-    
+        return result
+
     def _find_imgs(self, xpath, link):
         elements, _ = self._html_to_img()
         elements = list(elements)
@@ -195,16 +195,16 @@ class Analyzer(object) :
         result = self._find_img_urls(elements, url_extended, url_extended)
         if not result:
             result = self._find_img_urls(elements, url_base, url_extended)
-        
+
         return result
-    
+
     def find_img_xpath(self, link):
         urls = self._find_imgs(None, link)
         tree = etree.ElementTree(self.elem_tree)
         for elem, url in urls:
             if url == link:
                 return tree.getpath(elem)
-            
+
     def find_img_url(self, path):
         path += '/@src'
         result = self.elem_tree.xpath(path)[0]
@@ -213,8 +213,8 @@ class Analyzer(object) :
     def _url_exists(self, url):
         r = requests.get(url)
         return (r.status_code == 200)
-   
-    
+
+
     def find_imgs(self, xpath):
         elements = self._find_imgs(xpath, None)
         url_base = urlparse.urlparse(self.url)
@@ -228,10 +228,21 @@ class Analyzer(object) :
 
     def _index(self, parent, child):
 
-        prev = 1
-        for i in child.itersiblings(child.tag, preceding=True):
-            prev +=1
-        return prev
+        same = 1
+        for i in child.iter(child.tag):
+            same += 1
+
+        if same > 1:
+
+            prev = 1
+            for i in child.itersiblings(child.tag, preceding=True):
+                prev += 1
+            return prev
+        else:
+            prev = 1
+            for i in child.itersiblings(preceding=True):
+                prev += 1
+            return prev
 
     def _find_all_paths(self, text_map):
 
@@ -244,16 +255,17 @@ class Analyzer(object) :
             while node.tag != 'html':
                 parent = node.getparent()
                 idx = self._index(parent, node)
-                path.append((node.tag, [node.get('class'), node.get('id'), idx, False]))
+                path.append((node.tag, [node.get('class'), node.get('itemprop'), node.get('id'), idx]))
                 node = parent
-            path.reverse()
             content = self.find_content(path)
+            if not content:
+                continue
             if not content_path_map.get(content, None):
                 content_path_map[content] = [path]
                 result.append((path, content))
 
         return result
-    
+
     def _find_path(self, text_map, index):
         """
         Finds an xpath corresponding to the closest entry in a mapping between index and element.
@@ -267,7 +279,7 @@ class Analyzer(object) :
             tree
 
         Returns:
-            
+
         """
         while text_map.get(index) is None:
             index -= 1
@@ -280,11 +292,10 @@ class Analyzer(object) :
         while elem.tag != 'html':
             parent = elem.getparent()
             idx = self._index(parent, elem)
-            
-            path.append((elem.tag, [elem.get('class'), elem.get('id'), idx, False]))
+
+            path.append((elem.tag, [elem.get('class'), elem.get('itemprop'), elem.get('id'), idx]))
             elem = parent
-        path.reverse()
-        
+
         return path
 
 
@@ -299,12 +310,17 @@ class Analyzer(object) :
             result ():
 
         Returns:
-            
-        """
-        element = self.search(path[:])
-        return self._html_to_text(element)
 
-        
+        """
+        elements = self.search2(path[:])
+        result = ''
+        if not elements:
+            return None
+        for elem in elements:
+            result += '\n' + self._html_to_text(elem)
+        print('+'*20)
+        return result
+
     def _find_paths(self, matches, t_length, text_map):
         '''
         Find all paths that matches where found for.
@@ -326,7 +342,7 @@ class Analyzer(object) :
             result ():
 
         Returns:
-            
+
         '''
         paths = []
         sort_m = sorted(matches)
@@ -344,6 +360,8 @@ class Analyzer(object) :
                 if not path:
                     continue
                 content = self.find_content(path)
+                if not content:
+                    continue
                 if not content_path_map.get(content, None):
                     content_path_map[content] = path
                     result.append((path, content))
@@ -352,10 +370,10 @@ class Analyzer(object) :
                 #   paths.append(f)
 
         return result
-        
+
     def _find_text(self, text, search_string):
         """
-        
+
 
         Args:
             text ():
@@ -368,14 +386,14 @@ class Analyzer(object) :
             start_p (boolean):
 
         Returns:
-            
+
         """
-        
+
         diff = {}
         i_section = {}
         last_word_diff = False
-        i = [1] 
-        
+        i = [1]
+
         for word in difflib.ndiff(search_string.split(' '), text.split(' ')):
             # check for empty string
             if len(word[2:]) == 0:
@@ -415,7 +433,7 @@ class Analyzer(object) :
                     else:
                         i_section[j].append(word[2:])
 
-        return diff, i_section        
+        return diff, i_section
 
     def analyze(self, search_string=None):
         """
@@ -454,7 +472,7 @@ class Analyzer(object) :
         '''
         #return result
 
-        
+
     def construct_search_path(self, node, path, node_class=None, node_id=None, node_idx=None, modify=False):
 
         attrib_str = ''
@@ -469,144 +487,41 @@ class Analyzer(object) :
             return './/' + node + attrib_str + path[2:]
         return './/' + node + attrib_str
 
-    def search(self, path):
-        tree = etree.ElementTree(self.elem_tree)
-        
-        found = False
-        # use class and index as first element often does not have a class
-        
-        search_str_new = ''
-        search_str = ''
-        #f =8
-        #g = 2
-        k = 1
-        elements = []
-        elements_new = ['']
-        #print(path)
-        path_old = []
-        path[-1][1][3] = True
-        if len(path) > 1:
-            path[-2][1][3] = True
-        while not found:
-            for i in range(len(path)-2-k, -1, -4):
-                path[i][1][3] = True
-            path_old = path[:]
-            """
-            path_old = path[:]
-            node, node_attrib = path.pop()
-            node_class, node_id, node_idx, use = node_attrib
-            search_str_new = self.construct_search_path(node, search_str, node_class, node_id, node_idx)
-            elements_new = tree.findall(search_str_new)
-            if len(elements_new) == 1:
-                found = True
-            if len(path) > 0:
-                node, node_attrib = path.pop()
-                node_class, node_id, node_idx, use = node_attrib    
-                search_str_enw = self.construct_search_path(node, search_str_new, node_class, node_id, node_idx)
-                elements_new = tree.findall(search_str_new)
-                if len(elements_new) == 1:
-                    found = True
-            """
-            while len(path) > 0 and not found:
-                #print(search_str)
-                node, node_attrib = path.pop()
-                node_class, node_id, node_idx, use = node_attrib
-                #f -= 1
-                if use:
-                    search_str_new = self.construct_search_path(node, search_str, node_class, node_id, node_idx)
-                elif not use:
-                    search_str_new = self.construct_search_path(node, search_str)
-                #elements_new = tree.findall(search_str_new)
-                if len(path_old) - len(path) >= k:
-                    elements_new = tree.findall(search_str_new)
-                    #print(search_str_new)
-                    #print(elements_new)
-                    #print('#'*20)
 
-                    if len(elements_new) == 1:
-                        found = True
-                        #print('found')
-                        #print('-'*20)
-                        break
-                    elif len(elements_new) == len(elements):
-                        path = path_old[:]
-                        path_old = path[:]
-                        k += 1
-                        elements = elements_new
-                        #print('same length')
-                        #print('+'*20)
-                        break
-                    elif len(elements_new) == 0:
-                        pass
-                    elements = elements_new
-                    search_str = search_str_new
-                search_str = search_str_new
-            search_str = ''
-            path = path_old[:]
-            #g -= 1    
-        return elements_new[0]
-    
-    def search_to_delete(self, path):
-        tree = etree.ElementTree(self.elem_tree)
-        
-        found = False
-        # use class and index as first element often does not have a class
-        search_str = ''
-        elements = []
-        path_new = []
-        path, _ = path
-        path = path[:]
-        min_n = None
-        while len(path) > 0 and not found:
-            node, node_attrib = path.pop()
-            node_class, node_id, node_idx, use = node_attrib
-            s_1 = self.construct_search_path(node, search_str, node_class, node_id, node_idx)
-            s_2 = self.construct_search_path(node, search_str, node_class, node_idx=node_idx)
-            s_3 = self.construct_search_path(node, search_str, node_class, node_id=node_id)
-            s_4 = self.construct_search_path(node, search_str, node_id=node_id, node_idx=node_idx)
-            s_5 = self.construct_search_path(node, search_str, node_class)
-            s_6 = self.construct_search_path(node, search_str, node_id=node_id)
-            s_7 = self.construct_search_path(node, search_str, node_idx=node_idx)
-            s_8 = self.construct_search_path(node, search_str)
-            search_strings = [s_1, s_2, s_3, s_4, s_5, s_6, s_7, s_8]
-            for s in search_strings:
-                elements = tree.findall(s)
-                if len(elements) == 1:
-                    found = True
-                    break
-                if not min_n and len(elements) > 0:
-                    min_n = [elements, s]
-                else:
-                    if len(elements) > 0 and len(elements) < len(min_n[0]):
-                        min_n = [elements, s]
-            search_str = s
-            min_n = None
-        
-        return self._html_to_text(elements[0])
-    
     def eliminate_begin_and_end(self, xpaths, xpath_begin, xpath_end):
         path_begin, content_begin = xpath_begin
         path_end, content_end = xpath_end
         idx_begin = [idx for idx, tup in enumerate(xpaths) if tup[1] == content_begin]
         idx_end = [idx for idx, tup in enumerate(xpaths) if tup[1] == content_end]
-
         if len(idx_end) != 1:
-            content_end = self.search_to_delete(path_end)
-            idx_end = [[idx for idx, tup in enumerate(xpaths) if tup[1] == content_end]]
-        for i in range(len(xpaths)-1, idx_end[0], -1):
+            #content_end = self.search_to_delete(path_end)
+            content_end = self._html_to_text(self.search2(path_end[:])[0])
+            idx_end = [idx for idx, tup in enumerate(xpaths) if tup[1] == content_end]
+            if len(idx_end) == 0:
+                return False
+        for i in range(len(xpaths)-1, idx_end[0]-1, -1):
             xpaths.pop()
         if len(idx_begin) != 1:
-            content_begin = self.search_to_delete(path_begin)
-            idx_begin = [[idx for idx, tup in enumerate(xpaths) if tup[1] == content_begin]] 
-        for i in range(idx_begin[0]-1, -1, -1):
-            xpaths.pop(i)        
+            #content_begin = self.search_to_delete(path_begin)
+            content_begin = self._html_to_text(self.search2(path_begin[:])[0])
+            idx_begin = [idx for idx, tup in enumerate(xpaths) if tup[1] == content_begin]
+            if len(idx_begin) == 0:
+                return False
+        for i in range(idx_begin[0], -1, -1):
+            xpaths.pop(i)
+
+        return True
+
 
     def eliminate_actives(self, all_paths, actives):
+        """
+        After saving active records as actives, they are deleted from pool, so not to save them twice.
+        """
         for tup in actives:
             all_paths.remove(tup)
-    
+
     def eliminate_xpaths(self, stored_xpaths, found_xpaths, xpath_begin, xpath_end):
-       
+
         self.eliminate_begin_and_end(found_xpaths, xpath_begin, xpath_end)
 
         for path in stored_xpaths:
@@ -622,11 +537,60 @@ class Analyzer(object) :
                 new_path = new_path[:new_path.rfind('/')]
                 if new_path in found_xpaths:
                     delete_paths.append(path)
-        
+
         for path in delete_paths:
             try:
                 found_xpaths.remove(path)
             except ValueError as _:
                 pass
-        
+
         return found_xpaths
+
+
+    def class_contains(self, node, class_name):
+
+        match = re.search(r'(id-|post-)(\d+).*', class_name)
+        article_id = match.group(2) if match else None
+        if article_id:
+            class_name = class_name[:class_name.index(article_id)]
+        class_name = re.sub("[ \t\n]+", " ", class_name)
+        class_name = re.sub("[ \t\n]+$", "", class_name)
+        search_str = "//{0}[contains(concat(' ', normalize-space(@class), ' '), '{1}')]".format(node, class_name)
+        return search_str
+
+    def search2(self, path):
+
+        tree = etree.ElementTree(self.elem_tree)
+        search_term = []
+        while len(path) > 0:
+            node, node_attrib = path.pop()
+            node_class, node_item, node_id, node_idx = node_attrib
+            node_class_new = None
+            if node_class:
+                search_str = self.class_contains(node, node_class)
+            elif not node_class and node_item:
+                search_str = "//{0}[contains(concat(' ', normalize-space(@itemprop), ' '), '{1}')]".format(node, node_item)
+            elif not node_class and not node_item and node_id:
+                search_str = "//{0}[contains(concat(' ', normalize-space(@id), ' '), '{1}')]".format(node, node_id)
+            else:
+                search_str = "//{0}".format(node)
+            '''
+            if len(path) == 0:
+                if search_str[-1] == ']':
+                    search_str = search_str[:-1] + ' and position()={0}]'.format(node_idx)
+                else:
+                    search_str += '[position()={0}]'.format(node_idx)
+            '''
+            search_term.append(search_str)
+
+        search_term = ''.join(search_term)
+
+        elements = tree.xpath(search_term)
+        print(search_term)
+        if len(elements) == 1:
+            return elements
+        elif len(elements) > 1:
+            parent = elements[0].getparent()
+            return parent
+        else:
+            return None

@@ -22,7 +22,7 @@
       <div class='col-xs-5'>{{ form.desc }}</div>
       <div class='col-xs-5'>
         {% for record in item.crawler_set.all %}
-          <input type='checkbox' name='record' value={{ record.id }}>{{ record.content }}<br>
+        <label><input type='checkbox' name='record' value={{ record.id }}>{{ record.content }}<br></label>
         {% endfor %}
       </div>
     </div>

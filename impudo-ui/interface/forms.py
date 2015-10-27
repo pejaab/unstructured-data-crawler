@@ -1,5 +1,6 @@
 import re
 
+import ast
 from django import forms
 
 from interface.models import Template, Crawler, CrawlerImg
@@ -70,19 +71,16 @@ class TemplateForm(forms.models.ModelForm):
         url = self['url'].value()
         analyzer = Analyzer(url)
         all_paths = analyzer.analyze()
-        #index_begin = next((idx for idx, tup in enumerate(all_paths) if tup[1] == active[0].content), None)
-        #index_end = next((idx for idx, tup in enumerate(all_paths) if tup[1] == active[-1].content), None)
-        path_begin = (active[0].xpath, active[0].content)
-        path_end = (active[-1].xpath, active[-1].content)
-        #path_begin = all_paths[index_begin-1]
-        #path_end = all_paths[index_end+1]
-        Crawler.objects.create(template= self.instance, xpath= path_begin[0], content = path_begin[1], url= url, active= 2)
-        Crawler.objects.create(template= self.instance, xpath= path_end[0], content= path_end[1], url= url, active= 3)
+        path_begin = (ast.literal_eval(active[0].xpath), active[0].content)
+        path_end = (ast.literal_eval(active[-1].xpath), active[-1].content)
+        index_begin = all_paths.index(path_begin)
+        index_end = all_paths.index(path_end)
+        Crawler.objects.create(template= self.instance, xpath= all_paths[index_begin-1][0], content = all_paths[index_begin-1][1], url= url, active= 2)
+        Crawler.objects.create(template= self.instance, xpath= all_paths[index_end+1][0], content= all_paths[index_end+1][1], url= url, active= 3)
         
         analyzer.eliminate_begin_and_end(all_paths, path_begin, path_end)
         
         actives = []
-        import ast
         for crawler in active:
             #TODO: delete active xpaths from all_paths
             Crawler.objects.create(template= self.instance, xpath= crawler.xpath, content= crawler.content, url= url, active= 1)

@@ -31,8 +31,13 @@ class Dao(object) :
     #    self.cursor.execute(sql)
     #    return self.cursor
 
-    def get_desc_xpath(self, template_id):
-        sql = 'SELECT xpath from {0} where template_id={1} order by id asc'.format(self._table_crawler, template_id)
+    def get_desc_xpath(self, template_id, active=0):
+        sql = 'SELECT xpath from {0} where template_id={1} and active={2} order by id asc'.format(self._table_crawler, template_id, active)
+        self.cursor.execute(sql)
+        return self.cursor
+
+    def get_content(self, template_id, active=0):
+        sql = 'SELECT content from {0} where template_id={1} and active={2} order by id asc'.format(self._table_crawler, template_id, active)
         self.cursor.execute(sql)
         return self.cursor
 

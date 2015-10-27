@@ -23,8 +23,7 @@ def view_template(request, template_id):
                 record = Crawler.objects.get(id=int(record_id))
                 record.active = 1
                 record.save()
-
-            # Only inactive records are kept in database 
+            # Only inactive records are kept in database
             active_paths = list(Crawler.objects.filter(template_id=template_id, active=1))
             Crawler.objects.filter(template_id=template_id).delete()
             form.save_inactive_records(active_paths)
@@ -32,10 +31,11 @@ def view_template(request, template_id):
             if 'dispatch' in request.POST:
                 #TODO: redirect to manage page
                 if not 'record' in request.POST:
-                    return render(request, 'template.html', 
-                            {'form': form, 'item': item, 'img': img, 'not_selected_error': NO_SELECTION_ERROR})
+                    return render(request, 'template.html',
+                        {'form': form, 'item': item, 'img': img,
+                         'not_selected_error': NO_SELECTION_ERROR})
                 else:
-                    scrape.delay(template_id)
+                    #scrape.delay(template_id)
                     return render(request, 'home.html', {'form': TemplateForm()})
 
             # Delete xpath records before re-searching them
@@ -45,12 +45,13 @@ def view_template(request, template_id):
             form.analyze()
             return redirect(item)
         else:
-            return render(request, 'template.html', {'form': form, 'item': item,}) 
+            return render(request, 'template.html', {'form': form, 'item': item,})
     else:
         return render(
                 request, 'template.html', {
-                    'item': item, 
-                    'form': TemplateForm(initial={'url': item.url, 'desc': item.desc, 'img': item.img}),
+                    'item': item,
+                    'form': TemplateForm(initial={
+                        'url': item.url, 'desc': item.desc, 'img': item.img}),
                     'img': img,
                     }
                 )
