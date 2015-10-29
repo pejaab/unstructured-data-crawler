@@ -72,7 +72,6 @@ class Analyzer(object) :
         """
 
         text = "".join(filter(None, self._html_text_recursive(body)))
-        #text = html_tools.unescape(text)
         text = re.sub("[ \r\t\n\\xa0]+", " ", text).strip()
         text = re.sub("^[  \t\n]+", "", text, flags=re.M).strip()
         return text
@@ -102,7 +101,6 @@ class Analyzer(object) :
 
 
     def _html_to_textmap(self, html):
-        #TODO: documentation
         """
         Generates the text of a website by cleaning the html tags and a mapping between element and text.
 
@@ -153,9 +151,6 @@ class Analyzer(object) :
         if e.tag in ["script", "style"] or not isinstance(e.tag, str):
             return
         if e.tag == 'img': yield (e, e.attrib)
-        #TODO: if nothing is returned then turn of this condition
-        #if e.tag == "a": # thumbnails usually are below 'a' and are not needed
-            #return
         for c in e.iterchildren():
             for h in self._html_img_recursive(c):
                 yield h
@@ -171,8 +166,6 @@ class Analyzer(object) :
         for elem,attr in elements:
             if elem.tag == "img":
                 l = attr.get('src', None)
-            #elif elem.tag == "a":
-                #l = attr.get('href', None)
             if l is None:
                 continue
             l = urlparse.urljoin(url, l)
@@ -365,9 +358,6 @@ class Analyzer(object) :
                     content_path_map[content] = path
                     result.append((path, content))
 
-                #if f not in paths:
-                #   paths.append(f)
-
         return result
 
     def _find_text(self, text, search_string):
@@ -407,8 +397,6 @@ class Analyzer(object) :
                         diff[j].append(word[2:])
             elif start_p and not last_word_diff:
                 i = [m.start() for m in re.finditer(re.escape(word[2:]), text)]
-                #if i == -1:
-                #   i = len(text)
                 for j in i:
                     if not diff.get(j, None):
                         diff[j] = [word[2:]]
@@ -417,8 +405,6 @@ class Analyzer(object) :
                 last_word_diff = True
             elif not start_p and last_word_diff:
                 i = [m.start() for m in re.finditer(re.escape(word[2:]), text)]
-                #if i == -1:
-                #    i = len(text)
                 for j in i:
                     if not i_section.get(j, None):
                         i_section[j] = [word[2:]]
@@ -457,19 +443,9 @@ class Analyzer(object) :
         else:
             search_string = re.sub("[ \t\n]+", " ", search_string).lower()
             search_string = re.sub("[ \t\n]+$", "", search_string)
-            #matches = self._find_text(text, search_string.lower())
             diff, i_section = self._find_text(text, search_string)
-            #d_paths = self._find_paths(diff, text_map, root)
             i_paths = self._find_paths(i_section, len(text), text_map)
         return i_paths
-        '''
-        result = []
-        for p1,p2 in i_paths:
-            path = self._common(p1,p2)
-            if not path in result:
-                result.append(path)
-        '''
-        #return result
 
 
     def construct_search_path(self, node, path, node_class=None, node_id=None, node_idx=None, modify=False):
@@ -493,7 +469,6 @@ class Analyzer(object) :
         idx_begin = [idx for idx, tup in enumerate(xpaths) if tup[1] == content_begin]
         idx_end = [idx for idx, tup in enumerate(xpaths) if tup[1] == content_end]
         if len(idx_end) != 1:
-            #content_end = self.search_to_delete(path_end)
             content_end = self._html_to_text(self.search(path_end[:])[0])
             idx_end = [idx for idx, tup in enumerate(xpaths) if tup[1] == content_end]
             if len(idx_end) == 0:
@@ -501,7 +476,6 @@ class Analyzer(object) :
         for i in range(len(xpaths)-1, idx_end[0]-1, -1):
             xpaths.pop()
         if len(idx_begin) != 1:
-            #content_begin = self.search_to_delete(path_begin)
             content_begin = self._html_to_text(self.search(path_begin[:])[0])
             idx_begin = [idx for idx, tup in enumerate(xpaths) if tup[1] == content_begin]
             if len(idx_begin) == 0:
@@ -574,13 +548,6 @@ class Analyzer(object) :
                 search_str = "//{0}[contains(concat(' ', normalize-space(@id), ' '), '{1}')]".format(node, node_id)
             else:
                 search_str = "//{0}".format(node)
-            '''
-            if len(path) == 0:
-                if search_str[-1] == ']':
-                    search_str = search_str[:-1] + ' and position()={0}]'.format(node_idx)
-                else:
-                    search_str += '[position()={0}]'.format(node_idx)
-            '''
             search_term.append(search_str)
 
         search_term = ''.join(search_term)
