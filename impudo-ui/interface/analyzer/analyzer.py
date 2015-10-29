@@ -312,13 +312,12 @@ class Analyzer(object) :
         Returns:
 
         """
-        elements = self.search2(path[:])
+        elements = self.search(path[:])
         result = ''
         if not elements:
             return None
         for elem in elements:
             result += '\n' + self._html_to_text(elem)
-        print('+'*20)
         return result
 
     def _find_paths(self, matches, t_length, text_map):
@@ -495,7 +494,7 @@ class Analyzer(object) :
         idx_end = [idx for idx, tup in enumerate(xpaths) if tup[1] == content_end]
         if len(idx_end) != 1:
             #content_end = self.search_to_delete(path_end)
-            content_end = self._html_to_text(self.search2(path_end[:])[0])
+            content_end = self._html_to_text(self.search(path_end[:])[0])
             idx_end = [idx for idx, tup in enumerate(xpaths) if tup[1] == content_end]
             if len(idx_end) == 0:
                 return False
@@ -503,7 +502,7 @@ class Analyzer(object) :
             xpaths.pop()
         if len(idx_begin) != 1:
             #content_begin = self.search_to_delete(path_begin)
-            content_begin = self._html_to_text(self.search2(path_begin[:])[0])
+            content_begin = self._html_to_text(self.search(path_begin[:])[0])
             idx_begin = [idx for idx, tup in enumerate(xpaths) if tup[1] == content_begin]
             if len(idx_begin) == 0:
                 return False
@@ -549,7 +548,8 @@ class Analyzer(object) :
 
     def class_contains(self, node, class_name):
 
-        match = re.search(r'(id-|post-)(\d+).*', class_name)
+        #match = re.search(r'(id-|post-)(\d+).*', class_name)
+        match = re.search(r'(-|_)(\d+).*', class_name)
         article_id = match.group(2) if match else None
         if article_id:
             class_name = class_name[:class_name.index(article_id)]
@@ -558,7 +558,7 @@ class Analyzer(object) :
         search_str = "//{0}[contains(concat(' ', normalize-space(@class), ' '), '{1}')]".format(node, class_name)
         return search_str
 
-    def search2(self, path):
+    def search(self, path):
 
         tree = etree.ElementTree(self.elem_tree)
         search_term = []
@@ -586,7 +586,6 @@ class Analyzer(object) :
         search_term = ''.join(search_term)
 
         elements = tree.xpath(search_term)
-        print(search_term)
         if len(elements) == 1:
             return elements
         elif len(elements) > 1:

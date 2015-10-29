@@ -12,7 +12,7 @@ EMPTY_DESC_ERROR = 'You need to supply a description'
 EMPTY_IMG_ERROR = 'You need to supply a URL to an image'
 
 SCRAPE_TEXT = '''ALVAR AALTO
-MODEL 2145, 1942/ 1950S	
+MODEL 2145, 1942/ 1950S
 MORE
 EMBRU, SWITZERLAND
 
@@ -43,7 +43,7 @@ class TemplateForm(forms.models.ModelForm):
                 'desc': {'required': EMPTY_DESC_ERROR},
                 'img': {'required': EMPTY_IMG_ERROR},
                 }
-     
+
     def save(self):
         '''
         Saves the missing url_abbr field by pattern matching.
@@ -54,8 +54,8 @@ class TemplateForm(forms.models.ModelForm):
         url_abbr = match.group(2) if match else url
         self.instance.url_abbr = url_abbr
         return super(TemplateForm, self).save()
-    
-    def analyze(self): 
+
+    def analyze(self):
         desc = self['desc'].value().replace('\r', '')
         url = self['url'].value()
         img_url = self['img'].value()
@@ -67,26 +67,10 @@ class TemplateForm(forms.models.ModelForm):
 
         CrawlerImg.objects.create(template= self.instance, xpath= img_path, url= analyzer.find_img_url(img_path))
 
-    def save_inactive_records(self, active):
+    def save_active_records(self, active):
         url = self['url'].value()
-        analyzer = Analyzer(url)
-        all_paths = analyzer.analyze()
-        path_begin = (ast.literal_eval(active[0].xpath), active[0].content)
-        path_end = (ast.literal_eval(active[-1].xpath), active[-1].content)
-        index_begin = all_paths.index(path_begin)
-        index_end = all_paths.index(path_end)
-        Crawler.objects.create(template= self.instance, xpath= all_paths[index_begin-1][0], content = all_paths[index_begin-1][1], url= url, active= 2)
-        Crawler.objects.create(template= self.instance, xpath= all_paths[index_end+1][0], content= all_paths[index_end+1][1], url= url, active= 3)
-        
-        analyzer.eliminate_begin_and_end(all_paths, path_begin, path_end)
-        
-        actives = []
+
         for crawler in active:
             #TODO: delete active xpaths from all_paths
             Crawler.objects.create(template= self.instance, xpath= crawler.xpath, content= crawler.content, url= url, active= 1)
-            actives.append((ast.literal_eval(crawler.xpath), crawler.content))
-       
-        analyzer.eliminate_actives(all_paths, actives)
 
-        for path, content in all_paths:
-            Crawler.objects.create(template= self.instance, xpath= path, content= content, url= url) 

@@ -54,11 +54,6 @@ class ImpudoSpider(CrawlSpider):
         for content in result:
             self.not_desc_contents.append(content[0])
 
-        self.xpath_begin = ast.literal_eval(list(self.dao.get_desc_xpath(self.template_id, active=2))[0][0])
-        self.content_begin = list(self.dao.get_content(self.template_id, active=2))[0][0]
-        self.xpath_end = ast.literal_eval(list(self.dao.get_desc_xpath(self.template_id, active=3))[0][0])
-        self.content_end = list(self.dao.get_content(self.template_id, active=3))[0][0]
-
 
         #get img xpath
         self.img_xpath = self.dao.get_img_xpath(self.template_id)[0]
@@ -106,41 +101,13 @@ class ImpudoSpider(CrawlSpider):
         url = response.url
 
         for path in self.desc_xpaths:
-            print(path)
-            print(response.url)
             tempcont = a.find_content(path)
 
             if tempcont:
                 content += ' ' + tempcont
-                print(content)
         #ignore if no content is found
         if content:
-            found_xpaths = a.analyze()
-            check = a.eliminate_begin_and_end(found_xpaths, (self.xpath_begin, self.content_begin), (self.xpath_end, self.content_end))
-            if not check:
-                found_xpaths = self.desc_xpaths
-            print(found_xpaths)
-            print('#'*20)
-            result = ''
-            for xp in found_xpaths:
-                tempcont = a.find_content(xp)
-
-                if tempcont:
-                    result += ' ' + tempcont
-
-            '''
-            contains_paths = False
-            for path in self.desc_xpaths:
-                if path in xpaths_to_use:
-                    contains_paths = True
-
-                if contains_paths:
-                    break
-
-                if not contains_paths:
-                    result = content
-            '''
-            print title.encode('utf-8'), response.url, result.encode('utf-8')
+            print title.encode('utf-8'), response.url, content.encode('utf-8')
 
             # get image urls
             image_urls = []
@@ -150,13 +117,13 @@ class ImpudoSpider(CrawlSpider):
 
             #convert to utf8
             title = title.encode('utf-8')
-            content = result.encode('utf-8')
+            content = content.encode('utf-8')
 
 
             p = Product()
             p['template_id'] = self.template_id
             p['title'] = title
-            p['content'] = content
+            p['content'] = content[1:]
             p['url'] = response.url
             p['image_urls'] = image_urls
             yield p

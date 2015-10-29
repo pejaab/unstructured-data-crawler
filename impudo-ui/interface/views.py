@@ -26,7 +26,7 @@ def view_template(request, template_id):
             # Only inactive records are kept in database
             active_paths = list(Crawler.objects.filter(template_id=template_id, active=1))
             Crawler.objects.filter(template_id=template_id).delete()
-            form.save_inactive_records(active_paths)
+            form.save_active_records(active_paths)
 
             if 'dispatch' in request.POST:
                 #TODO: redirect to manage page
@@ -35,7 +35,7 @@ def view_template(request, template_id):
                         {'form': form, 'item': item, 'img': img,
                          'not_selected_error': NO_SELECTION_ERROR})
                 else:
-                    #scrape.delay(template_id)
+                    scrape.delay(template_id)
                     return render(request, 'home.html', {'form': TemplateForm()})
 
             # Delete xpath records before re-searching them
