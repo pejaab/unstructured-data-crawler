@@ -61,11 +61,11 @@ class TemplateForm(forms.models.ModelForm):
         img_url = self['img'].value()
         analyzer = Analyzer(url)
         paths = analyzer.analyze(desc)
-        img_path = analyzer.find_img_xpath(img_url)
+        img_path = analyzer.analyze_img(img_url)
         for path, content in paths:
             Crawler.objects.create(template= self.instance, xpath= path, content= content, url= url)
 
-        CrawlerImg.objects.create(template= self.instance, xpath= img_path, url= analyzer.find_img_url(img_path))
+        CrawlerImg.objects.create(template= self.instance, xpath= img_path, url= analyzer.find_img_url(img_url))
 
     def save_active_records(self, active):
         url = self['url'].value()

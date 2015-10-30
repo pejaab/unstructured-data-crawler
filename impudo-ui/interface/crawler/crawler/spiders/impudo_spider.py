@@ -56,7 +56,7 @@ class ImpudoSpider(CrawlSpider):
 
 
         #get img xpath
-        self.img_xpath = self.dao.get_img_xpath(self.template_id)[0]
+        self.img_xpath = ast.literal_eval(self.dao.get_img_xpath(self.template_id)[0])
 
         #get and set rules for specific domain if they exist in the db
         textrules = self.dao.get_rules(self.allowed_domains[0])
@@ -110,10 +110,10 @@ class ImpudoSpider(CrawlSpider):
             print title.encode('utf-8'), response.url, content.encode('utf-8')
 
             # get image urls
-            image_urls = []
-            for img in a.find_imgs(self.img_xpath):
+            print(self.img_xpath)
+            image_urls = a.search_imgs(self.img_xpath[:])
+            for img in image_urls:
                 print(img)
-                image_urls.append(img)
 
             #convert to utf8
             title = title.encode('utf-8')

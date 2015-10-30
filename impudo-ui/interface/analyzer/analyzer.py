@@ -5,6 +5,7 @@ import re
 import difflib
 import requests
 import urlparse
+import urllib
 import collections
 
 class Analyzer(object) :
@@ -150,7 +151,7 @@ class Analyzer(object) :
         """
         if e.tag in ["script", "style"] or not isinstance(e.tag, str):
             return
-        if e.tag == 'img': yield (e, e.attrib)
+        if e.tag == 'img': yield (e, e.get('src'))
         for c in e.iterchildren():
             for h in self._html_img_recursive(c):
                 yield h
@@ -158,66 +159,19 @@ class Analyzer(object) :
     def _html_to_img(self):
 
         body = self.elem_tree.xpath('//body')[0]
-        elements = self._html_img_recursive(body)
-        return elements, body
+        elements = list(self._html_img_recursive(body))
+        return elements
 
-    def _find_img_urls(self, elements, url, url_extended):
-        result = []
-        for elem,attr in elements:
-            if elem.tag == "img":
-                l = attr.get('src', None)
-            if l is None:
-                continue
-            l = urlparse.urljoin(url, l)
-            l = l[:l.rfind('/')] + '/'
-            if url_extended == l[:l.rfind('/')] + '/':
-                result.append((elem, attr['src'].replace(' ', '%20')))
-        return result
+    def _find_img(self, url):
 
-    def _find_imgs(self, xpath, link):
-        elements, _ = self._html_to_img()
-        elements = list(elements)
-        result = []
-        if xpath:
-            link = self.find_img_url(xpath)
+        url = urllib.quote(urllib.unquote(url[url.rfind('/')+1:]))
+        elements = self._html_to_img()
+        element = next(((elem, u) for elem, u in elements if urllib.quote(u[u.rfind('/')+1:]) == url), None)
 
-        url_base = urlparse.urlparse(self.url)
-        url_base = url_base.scheme + '://' + url_base.netloc
-        url_extended = urlparse.urljoin(url_base, link)
-        url_extended = url_extended[:url_extended.rfind('/')] + '/'
-        result = self._find_img_urls(elements, url_extended, url_extended)
-        if not result:
-            result = self._find_img_urls(elements, url_base, url_extended)
+        return element[0]
 
-        return result
-
-    def find_img_xpath(self, link):
-        urls = self._find_imgs(None, link)
-        tree = etree.ElementTree(self.elem_tree)
-        for elem, url in urls:
-            if url == link:
-                return tree.getpath(elem)
-
-    def find_img_url(self, path):
-        path += '/@src'
-        result = self.elem_tree.xpath(path)[0]
-        return result.replace(' ', '%20')
-
-    def _url_exists(self, url):
-        r = requests.get(url)
-        return (r.status_code == 200)
-
-
-    def find_imgs(self, xpath):
-        elements = self._find_imgs(xpath, None)
-        url_base = urlparse.urlparse(self.url)
-        url_base = url_base.scheme + '://' + url_base.netloc
-        result = []
-        for e, url in elements:
-            u = urlparse.urljoin(url_base, url)
-            if self._url_exists(u):
-                result.append(u)
-        return result
+    def find_img_url(self, url):
+        return self._find_img(url).get('src')
 
     def _index(self, parent, child):
 
@@ -291,6 +245,70 @@ class Analyzer(object) :
 
         return path
 
+    def _find_img_path(self, elem):
+
+        tree = etree.ElementTree(self.elem_tree)
+        path = []
+        while elem.tag != 'html':
+            parent = elem.getparent()
+            idx = self._index(parent, elem)
+
+            path.append((elem.tag, [elem.get('class'), elem.get('itemprop'), elem.get('id'), idx]))
+            elem = parent
+
+        return path
+
+    def _find_descendant_imgs(self, elem):
+        if not isinstance(elem.tag, str):
+            return
+        if elem.tag == 'img':
+            yield elem.get('src')
+        for e in elem.iterchildren():
+            for h in self._find_descendant_imgs(e):
+                yield h
+
+    def search_imgs(self, path):
+
+        tree = etree.ElementTree(self.elem_tree)
+        search_term = []
+        while len(path) > 0:
+            node, node_attrib = path.pop()
+            node_class, node_item, node_id, node_idx = node_attrib
+            node_class_new = None
+            if node_class:
+                search_str = self.class_contains(node, node_class)
+            elif not node_class and node_item:
+                search_str = "//{0}[contains(concat(' ', normalize-space(@itemprop), ' '), '{1}')]".format(node, node_item)
+            elif not node_class and not node_item and node_id:
+                search_str = "//{0}[contains(concat(' ', normalize-space(@id), ' '), '{1}')]".format(node, node_id)
+            else:
+                search_str = "//{0}".format(node)
+            search_term.append(search_str)
+        search_term = ''.join(search_term)
+
+        elements = tree.xpath(search_term)
+
+        return list(self._find_descendant_imgs(elements[0]))
+
+    def analyze_img(self, link):
+
+        elem = self._find_img(link)
+        elem = elem.getparent() # to loose img elem
+        elem = elem.getparent() # to access img from first top level
+
+        imgs = list(self._find_descendant_imgs(elem))
+        elem_new = elem
+        imgs_new = []
+        for _ in range(0, 2):
+            elem_new = elem_new.getparent()
+            imgs_new = list(self._find_descendant_imgs(elem_new))
+            if len(imgs_new) > len(imgs):
+                break
+
+        if len(imgs_new) > len(imgs):
+            elem = elem_new
+
+        return self._find_img_path(elem)
 
     def find_content(self, path):
         """
@@ -446,22 +464,6 @@ class Analyzer(object) :
             diff, i_section = self._find_text(text, search_string)
             i_paths = self._find_paths(i_section, len(text), text_map)
         return i_paths
-
-
-    def construct_search_path(self, node, path, node_class=None, node_id=None, node_idx=None, modify=False):
-
-        attrib_str = ''
-        if node_class:
-            attrib_str = '[@class="{0}"]'.format(node_class)
-        if node_id:
-            attrib_str = '[@id="{0}"]'.format(node_id)
-        if node_idx:
-            attrib_str += '[{0}]'.format(str(node_idx))
-
-        if path:
-            return './/' + node + attrib_str + path[2:]
-        return './/' + node + attrib_str
-
 
     def eliminate_begin_and_end(self, xpaths, xpath_begin, xpath_end):
         path_begin, content_begin = xpath_begin
