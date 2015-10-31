@@ -34,11 +34,11 @@ class RecordAdmin(ExportActionModelAdmin):
     list_filter = (
             ('template', admin.RelatedOnlyFieldListFilter),
             )
-    search_fields = ['template__id', 'template__url_abbr']
+    search_fields = ['template__url_abbr', 'title', 'result']
     inlines = [ImageInline,]
 
     resource_class = RecordResource
-    
+
 
 class CrawlerInline(admin.TabularInline):
     model = Crawler

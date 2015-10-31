@@ -110,7 +110,6 @@ class ImpudoSpider(CrawlSpider):
             print title.encode('utf-8'), response.url, content.encode('utf-8')
 
             # get image urls
-            print(self.img_xpath)
             image_urls = a.search_imgs(self.img_xpath[:])
             for img in image_urls:
                 print(img)
