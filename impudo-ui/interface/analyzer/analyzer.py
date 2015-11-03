@@ -310,6 +310,15 @@ class Analyzer(object) :
 
         return self._find_img_path(elem)
 
+    def url_exists(self, url):
+        return (urlparse.urlparse(url).scheme == 'http')
+
+    def extend_url(self, link):
+        url_base = urlparse.urlparse(self.url)
+        url_base = url_base.scheme + '://' + url_base.netloc
+        url_extended = urlparse.urljoin(url_base, link)
+        return url_extended
+
     def find_content(self, path):
         """
         Finds the text referenced by an xpath.

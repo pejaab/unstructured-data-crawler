@@ -99,18 +99,28 @@ class ImpudoSpider(CrawlSpider):
         title = response.xpath("/html/head/title/text()").extract()[0]
         title = re.sub("[ \t]+", " ", title).strip()
         url = response.url
-
+        counter = 0
         for path in self.desc_xpaths:
             tempcont = a.find_content(path)
 
             if tempcont:
                 content += ' ' + tempcont
+            else:
+                counter += 1
         #ignore if no content is found
+        if counter >= 2:
+            content = ''
         if content:
             print title.encode('utf-8'), response.url, content.encode('utf-8')
 
             # get image urls
             image_urls = a.search_imgs(self.img_xpath[:])
+            image_urls_extended = []
+            if not a.url_exists(image_urls[0]):
+                for img in image_urls:
+                    image_urls_extended.append(a.extend_url(img))
+
+            image_urls = image_urls_extended
             for img in image_urls:
                 print(img)
 
