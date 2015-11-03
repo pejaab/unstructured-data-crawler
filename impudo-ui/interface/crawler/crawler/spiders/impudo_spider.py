@@ -117,8 +117,6 @@ class ImpudoSpider(CrawlSpider):
             image_urls = a.search_imgs(self.img_xpath[:])
             image_urls_extended = []
             extend = False
-            print(image_urls)
-            print('-'*20)
             for img in image_urls:
                 if not a.url_exists(img):
                     extend = True
@@ -129,7 +127,6 @@ class ImpudoSpider(CrawlSpider):
 
                 image_urls = image_urls_extended
 
-            print(image_urls)
             for img in image_urls:
                 print(img)
 
