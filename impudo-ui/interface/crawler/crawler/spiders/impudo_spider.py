@@ -62,30 +62,71 @@ class ImpudoSpider(CrawlSpider):
         textrules = self.dao.get_rules(self.allowed_domains[0])
 
         if textrules:
-            follows = tuple(textrules[0].split(','))
-            parses = tuple(textrules[1].split(','))
-            follow_denies = tuple(textrules[2].split(','))
-            parse_denies = tuple(textrules[3].split(','))
-            xpath_follow_restrict = textrules[4]
+            frulesactive = False
+            prulesactive = False
+            fprulesactive = False
+            frule = None
+            prule = None
+            fprule = None
 
-            #If xpath_restrictions exist
-            if xpath_follow_restrict:
-                ImpudoSpider.rules = (
-                    Rule(LinkExtractor(allow=follows, deny=follow_denies, restrict_xpaths=(xpath_follow_restrict)), follow=True),
-                    Rule(LinkExtractor(allow=parses, deny=parse_denies), callback='parse_product'),
-                )
+            follows = None
+            follow_denies = None
+            xpath_follow_restrict = None
+            parses = None
+            parse_denies = None
+            xpath_parse_restrict = None
+            follow_and_parse = None
+            follow_and_parse_denies = None
+            xpath_fp_restrict = None
+
+            if textrules[0] or textrules[1] or textrules[2]:
+                frulesactive = True
+                follows = tuple(textrules[0].split(','))
+                follow_denies = tuple(textrules[1].split(','))
+                xpath_follow_restrict = textrules[2]
+                if not xpath_follow_restrict:
+                    frule = Rule(LinkExtractor(allow=follows, deny=follow_denies,), follow=True)
+                else:
+                    frule = Rule(LinkExtractor(allow=follows, deny=follow_denies, restrict_xpaths=(xpath_follow_restrict)), follow=True)
+
+            if textrules[3] or textrules[4] or textrules[5]:
+                prulesactive = True
+                parses = tuple(textrules[3].split(','))
+                parse_denies = tuple(textrules[4].split(','))
+                xpath_parse_restrict = textrules[5]
+                if not xpath_parse_restrict:
+                    prule = Rule(LinkExtractor(allow=parses, deny=parse_denies, ), callback='parse_product')
+                else:
+                    prule = Rule(LinkExtractor(allow=parses, deny=parse_denies, restrict_xpaths=(xpath_parse_restrict)), callback='parse_product')
+
+
+            if textrules[6] or textrules[7] or textrules[8]:
+                fprulesactive = True
+                follow_and_parse = tuple(textrules[6].split(','))
+                follow_and_parse_denies = tuple(textrules[7].split(','))
+                xpath_fp_restrict = textrules[8]
+                if not xpath_fp_restrict:
+                    fprule = Rule(LinkExtractor(allow=follow_and_parse, deny=follow_and_parse_denies,), callback='parse_product', follow=True)
+                else:
+                    fprule = Rule(LinkExtractor(allow=follow_and_parse, deny=follow_and_parse_denies, restrict_xpaths=(xpath_fp_restrict)), callback='parse_product', follow=True)
+
+            #given rules were empty, use standard Ruleset
+            if not frulesactive and not prulesactive and not fprulesactive:
+                ImpudoSpider.rules = (Rule(LinkExtractor(allow=('')), callback='parse_product', follow=True),)
             else:
-                ImpudoSpider.rules = (
-                    Rule(LinkExtractor(allow=follows, deny=follow_denies), follow=True),
-                    Rule(LinkExtractor(allow=parses, deny=parse_denies), callback='parse_product'),
-                )
+                ImpudoSpider.rules = ()
+                if fprulesactive:
+                    ImpudoSpider.rules = ImpudoSpider.rules +  (fprule, )
+                if frulesactive:
+                    ImpudoSpider.rules = ImpudoSpider.rules + (frule, )
+                if prulesactive:
+                    ImpudoSpider.rules = ImpudoSpider.rules + (prule, )
+
         else:
             #follow all links
             ImpudoSpider.rules = (
                 Rule(LinkExtractor(allow=('')), callback='parse_product', follow=True),
             )
-
-
         super(ImpudoSpider, self).__init__()
 
 
