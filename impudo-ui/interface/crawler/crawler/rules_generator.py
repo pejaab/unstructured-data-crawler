@@ -1,10 +1,10 @@
 import difflib
 from difflib import SequenceMatcher
-from dao import Dao
 import re
+from urlparse import urlparse
 
-def remove_host(url, domain):
-	return url[url.find(domain)+len(domain):]
+def remove_host(url):
+	return urlparse(url).path
 
 def longest_match(urls):
 	result = urls[0]
@@ -16,44 +16,15 @@ def longest_match(urls):
 
 	return result
 
-def generate_rule(urls, domain):
-	return remove_host(longest_match(urls),domain)
-
-def save_rules(urls, domain):
-	d = Dao()
-	
-	follow_rules=""
-	parse_rules = re.escape(generate_rule(TestUrls,domain))
-	follow_rules_deny = ""
-	parse_rules_deny = ""
-
-	#insert only if no previous entry exists
-	if not d.get_rules(domain):
-		d.insert_rule(domain,follow_rules,parse_rules,follow_rules_deny,parse_rules_deny)
-
+def generate_rule(urls):
+	return re.escape(longest_match([remove_host(x) for x in urls]))
 
 
 if __name__ == "__main__":
 
-	domain = "vittorioragone.com"
-
-	TestUrls = [ "http://www.vittorioragone.com/stock/product.php?p=491?img=0",
-		"http://www.vittorioragone.com/stock/product.php?p=501?img=0",
-		"http://www.vittorioragone.com/stock/product.php?p=654?img=0",
-		"http://www.vittorioragone.com/stock/product.php?p=123?img=0"
+	urls = ["http://test.com/sdcs/add-to-cart=\"",
+		"http://test.com/abxy/add-to-cart=\"",
+		"http://test.com/bt67/add-to-cart=\"",
 	]
-
-	domain2 = "etoz.ch"
-	TestUrls2 = ["http://www.etoz.ch/la-tourette/",
-		"http://www.etoz.ch/victoria-lounge-chair/",
-	]
-
-
-
-
-
-
-
-
-
-	
+	#example usage
+	print generate_rule(urls)
