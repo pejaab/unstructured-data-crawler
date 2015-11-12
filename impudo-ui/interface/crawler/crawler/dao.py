@@ -1,4 +1,4 @@
-import MySQLdb 
+import MySQLdb
 
 class Dao(object) :
 
@@ -13,7 +13,7 @@ class Dao(object) :
     _table_record = 'interface_record'
     _table_record_details = 'interface_record_details'
     _table_image = 'interface_image'
-    _table_crawlerimg = 'interface_crawlerimg'
+    _table_crawlerimgpath = 'interface_crawlerimgpath'
     _table_crawler = 'interface_crawler'
     _table_rules = 'impudo_rules'
 
@@ -42,8 +42,9 @@ class Dao(object) :
         return self.cursor
 
     def get_img_xpath(self, template_id):
-        sql = 'SELECT xpath from {0} where template_id={1}'.format(self._table_crawlerimg, template_id)
-        return self.query_sql(sql)
+        sql = 'SELECT xpath from {0} where template_id={1} order by id asc'.format(self._table_crawlerimgpath, template_id)
+        self.cursor.execute(sql)
+        return self.cursor
 
     def get_rules(self, url):
         sql = 'SELECT follow_rules, follow_rules_deny, follow_xpath_restrict, parse_rules, parse_rules_deny, parse_xpath_restrict, follow_and_parse_rules, follow_and_parse_rules_deny, follow_and_parse_xpath_restrict from {0} where domain = "{1}" limit 1'.format(self._table_rules, url)

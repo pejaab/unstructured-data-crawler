@@ -10,12 +10,12 @@ class Template(models.Model):
     url = models.URLField()
     desc = models.TextField(verbose_name='Description')
     img = models.TextField(verbose_name='Image Url')
-    
+
     def __str__(self):
         return self.url_abbr
-    
+
     def get_absolute_url(self):
-        return reverse('view_template', args=[self.id])    
+        return reverse('view_template', args=[self.id])
 
 class Crawler(models.Model):
     template = models.ForeignKey(Template, default=None)
@@ -35,16 +35,18 @@ class Record(models.Model):
     result = models.TextField()
     price = models.CharField(max_length=100, blank=True)
     dimensions = models.CharField(max_length=100, blank=True)
-    
+
     def __str__(self):
         return str(self.pk)
 
 
 class CrawlerImg(models.Model):
     template = models.ForeignKey(Template, default=None)
-    xpath = models.TextField()
     url = models.TextField()
 
+class CrawlerImgPath(models.Model):
+    template = models.ForeignKey(Template, default=None)
+    xpath = models.TextField()
 
 class Image(models.Model):
     '''
@@ -64,4 +66,4 @@ class Image(models.Model):
 
     def __str__(self):
         return str(self.pk)
-    
+

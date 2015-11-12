@@ -7,8 +7,8 @@ import requests
 import urlparse
 import urllib
 import collections
-import PIL
-import StringIO
+from PIL import Image
+from StringIO import StringIO
 
 class Analyzer(object) :
 
@@ -264,10 +264,15 @@ class Analyzer(object) :
         if not isinstance(elem.tag, str):
             return
         if elem.tag == 'img':
-            yield elem.get('src')
+            yield self._extend_url(elem.get('src'))
         for e in elem.iterchildren():
             for h in self._find_descendant_imgs(e):
                 yield h
+
+    def _get_img_size(self, img):
+        response = requests.get(img)
+        img_child = Image.open(StringIO(response.content))
+        return img_child.size
 
     def search_imgs(self, path):
 
@@ -299,9 +304,7 @@ class Analyzer(object) :
         elem = elem.getparent() # to access img from first top level
 
         imgs = list(self._find_descendant_imgs(elem))
-        response = requests.get(imgs[0])
-        img = PIL.Image.open(StringIO.StringIO(response.content))
-        width, height = img.size
+        width, height = self._get_img_size(imgs[0])
         elem_new = elem
         imgs_new = []
         result_elems = []
@@ -312,9 +315,9 @@ class Analyzer(object) :
                 children = list(elem_new)
                 for child in children:
                     imgs_child = list(self._find_descendant_imgs(child))
-                    response_child = requests.get(imgs_child[0])
-                    img_child = PIL.Image.open(StringIO.StringIO(response.content))
-                    width_child, height_child = img_child.size
+                    if len(imgs_child) == 0:
+                        continue
+                    width_child, height_child = self._get_img_size(imgs_child[o])
                     if width > width_child or height > height_child:
                         pass
                     else:
@@ -324,7 +327,17 @@ class Analyzer(object) :
         if len(imgs_new) > len(imgs):
             elems = result_elems
         else:
-            elems = [elem]
+            children = list(elem)
+            for child in children:
+                imgs_child = list(self._find_descendant_imgs(child))
+                if len(imgs_child) == 0:
+                    continue
+                width_child, height_child = self._get_img_size(imgs_child[0])
+                if width > width_child or height > height_child:
+                    pass
+                else:
+                    result_elems.append(child)
+            elems = result_elems
 
         paths = []
         for elem in elems:
@@ -332,10 +345,7 @@ class Analyzer(object) :
 
         return paths
 
-    def url_exists(self, url):
-        return (urlparse.urlparse(url).scheme == 'http')
-
-    def extend_url(self, url):
+    def _extend_url(self, url):
         if 'http' in url:
             return url
         url_base = urlparse.urlparse(self.url)

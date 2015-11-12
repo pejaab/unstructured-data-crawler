@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
 from interface.forms import TemplateForm
-from interface.models import Template, Crawler, CrawlerImg
+from interface.models import Template, Crawler, CrawlerImg, CrawlerImgPath
 from interface.tasks import scrape
 
 NO_SELECTION_ERROR = 'You need to select at least one option'
@@ -41,6 +41,7 @@ def view_template(request, template_id):
             # Delete xpath records before re-searching them
             Crawler.objects.filter(template_id=template_id).delete()
             CrawlerImg.objects.filter(template_id=template_id).delete()
+            CrawlerImgPath.objects.filter(template_id=template_id).delete()
             item = form.save()
             form.analyze()
             return redirect(item)

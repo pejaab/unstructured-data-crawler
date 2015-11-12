@@ -39,6 +39,7 @@ class ImpudoSpider(CrawlSpider):
 
         #get desc xpaths
         result = self.dao.get_desc_xpath(self.template_id, active=1)
+        print(result)
         self.desc_xpaths = []
         for xpath  in result:
             self.desc_xpaths.append(ast.literal_eval(xpath[0]))
@@ -56,7 +57,12 @@ class ImpudoSpider(CrawlSpider):
 
 
         #get img xpath
-        self.img_xpath = ast.literal_eval(self.dao.get_img_xpath(self.template_id)[0])
+        self.img_xpath = []
+        result = self.dao.get_img_xpath(self.template_id)
+        print(result)
+        for xpath in result:
+            print(xpath)
+            self.img_xpath.append(ast.literal_eval(xpath[0]))
 
         #get and set rules for specific domain if they exist in the db
         textrules = self.dao.get_rules(self.allowed_domains[0])
@@ -155,7 +161,10 @@ class ImpudoSpider(CrawlSpider):
             print title.encode('utf-8'), response.url, content.encode('utf-8')
 
             # get image urls
-            image_urls = a.search_imgs(self.img_xpath[:])
+            image_urls = []
+            for xpath in self.img_xpath:
+                image_urls += a.search_imgs(xpath[:])
+            '''
             image_urls_extended = []
             extend = False
             for img in image_urls:
@@ -167,7 +176,7 @@ class ImpudoSpider(CrawlSpider):
                     image_urls_extended.append(a.extend_url(img))
 
                 image_urls = image_urls_extended
-
+            '''
             for img in image_urls:
                 print(img)
 
