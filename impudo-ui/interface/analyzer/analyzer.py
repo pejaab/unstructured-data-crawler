@@ -7,6 +7,8 @@ import requests
 import urlparse
 import urllib
 import collections
+import PIL
+import StringIO
 
 class Analyzer(object) :
 
@@ -297,26 +299,48 @@ class Analyzer(object) :
         elem = elem.getparent() # to access img from first top level
 
         imgs = list(self._find_descendant_imgs(elem))
+        response = requests.get(imgs[0])
+        img = PIL.Image.open(StringIO.StringIO(response.content))
+        width, height = img.size
         elem_new = elem
         imgs_new = []
+        result_elems = []
         for _ in range(0, 2):
             elem_new = elem_new.getparent()
             imgs_new = list(self._find_descendant_imgs(elem_new))
             if len(imgs_new) > len(imgs):
+                children = list(elem_new)
+                for child in children:
+                    imgs_child = list(self._find_descendant_imgs(child))
+                    response_child = requests.get(imgs_child[0])
+                    img_child = PIL.Image.open(StringIO.StringIO(response.content))
+                    width_child, height_child = img_child.size
+                    if width > width_child or height > height_child:
+                        pass
+                    else:
+                        result_elems.append(child)
                 break
 
         if len(imgs_new) > len(imgs):
-            elem = elem_new
+            elems = result_elems
+        else:
+            elems = [elem]
 
-        return self._find_img_path(elem)
+        paths = []
+        for elem in elems:
+            paths.append(self._find_img_path(elem))
+
+        return paths
 
     def url_exists(self, url):
         return (urlparse.urlparse(url).scheme == 'http')
 
-    def extend_url(self, link):
+    def extend_url(self, url):
+        if 'http' in url:
+            return url
         url_base = urlparse.urlparse(self.url)
         url_base = url_base.scheme + '://' + url_base.netloc
-        url_extended = urlparse.urljoin(url_base, link)
+        url_extended = urlparse.urljoin(url_base, url)
         return url_extended
 
     def find_content(self, path):
