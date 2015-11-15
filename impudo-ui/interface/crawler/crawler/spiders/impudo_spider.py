@@ -39,7 +39,6 @@ class ImpudoSpider(CrawlSpider):
 
         #get desc xpaths
         result = self.dao.get_desc_xpath(self.template_id, active=1)
-        print(result)
         self.desc_xpaths = []
         for xpath  in result:
             self.desc_xpaths.append(ast.literal_eval(xpath[0]))
@@ -59,9 +58,7 @@ class ImpudoSpider(CrawlSpider):
         #get img xpath
         self.img_xpath = []
         result = self.dao.get_img_xpath(self.template_id)
-        print(result)
         for xpath in result:
-            print(xpath)
             self.img_xpath.append(ast.literal_eval(xpath[0]))
 
         #get and set rules for specific domain if they exist in the db

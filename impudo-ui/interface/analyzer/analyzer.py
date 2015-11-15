@@ -317,7 +317,7 @@ class Analyzer(object) :
                     imgs_child = list(self._find_descendant_imgs(child))
                     if len(imgs_child) == 0:
                         continue
-                    width_child, height_child = self._get_img_size(imgs_child[o])
+                    width_child, height_child = self._get_img_size(imgs_child[0])
                     if width > width_child or height > height_child:
                         pass
                     else:
