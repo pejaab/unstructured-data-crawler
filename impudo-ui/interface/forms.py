@@ -50,7 +50,7 @@ class TemplateForm(forms.models.ModelForm):
         '''
         #template = super(TemplateForm, self).save(commit=False)
         url = self['url'].value()
-        match = re.search(r'^(http://www.|http://)(.*)\.', url)
+        match = re.search(r'^(http://www.|http://)(.*?)\.', url)
         url_abbr = match.group(2) if match else url
         self.instance.url_abbr = url_abbr
         return super(TemplateForm, self).save()
