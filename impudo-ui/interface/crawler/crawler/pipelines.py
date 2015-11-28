@@ -15,13 +15,15 @@ class ImpudoImagesPipeline(ImagesPipeline):
     #Name download version
     def file_path(self, request, response=None, info=None):
         template_id = request.meta['template_id']
+        url = request.meta['url'].split('/')[-1]
         image_guid = request.url.split('/')[-1]
-        return 'full/template_{0}/{1}'.format(template_id, image_guid)
+        return 'full/template_{}/{}_{}'.format(template_id, url, image_guid)
         #return 'full/%s' % (image_guid)
 
     def get_media_requests(self, item, info):
         for image_url in item['image_urls']:
-            yield scrapy.Request(image_url, meta={'template_id': item['template_id']})
+            yield scrapy.Request(image_url, meta={'template_id': item['template_id'],
+                                                  'url': item['url']})
 
     def extract_price_and_dimensions(self, text):
         #moneyregexold = r"""[+-]?[0-9]{1,3}(?:[0-9]*(?:[.,][0-9]{2})?(?:\.-)?|(?:,[0-9]{3})*(?:\.[0-9]{2})?(?:\.-)?|(?:\.[0-9]{3})*(?:,[0-9]{2})?)?(?:\.-)?"""
