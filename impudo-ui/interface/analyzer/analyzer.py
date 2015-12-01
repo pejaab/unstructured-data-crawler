@@ -38,6 +38,7 @@ class Analyzer(object) :
         self.r = requests.get(url=url, headers=headers)
         self.r.raise_for_status()
         self.elem_tree = lxml.html.document_fromstring(self.r.text)
+        self.elem_tree.make_links_absolute(url)
         self.check_list = []
 
 
@@ -267,7 +268,7 @@ class Analyzer(object) :
         if not isinstance(elem.tag, str):
             return
         if elem.tag == 'img':
-            url = self._extend_url(elem.get('src'))
+            url = elem.get('src')
             if url is not None:
                 yield url
         for e in elem.iterchildren():
@@ -349,16 +350,6 @@ class Analyzer(object) :
             paths.append(self._find_img_path(elem))
 
         return paths
-
-    def _extend_url(self, url):
-        if 'http' in url:
-            return url
-        url_base = urlparse.urlparse(self.url)
-        url_base = url_base.scheme + '://' + url_base.netloc
-        url_extended = urlparse.urljoin(url_base, url)
-        if 'http' not in url_extended:
-            return None
-        return url_extended
 
     def find_content(self, path):
         """
