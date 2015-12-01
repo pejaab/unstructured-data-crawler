@@ -269,12 +269,11 @@ class Analyzer(object) :
             return
         if elem.tag == 'img':
             url = elem.get('src')
-            if url is not None:
+            if 'http' in url:
                 yield url
         for e in elem.iterchildren():
             for h in self._find_descendant_imgs(e):
-                if h is not None:
-                    yield h
+                yield h
 
     def _get_img_size(self, img):
         response = requests.get(img)
