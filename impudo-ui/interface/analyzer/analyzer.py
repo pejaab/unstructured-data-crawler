@@ -157,7 +157,7 @@ class Analyzer(object) :
         """
         if e.tag in ["script", "style"] or not isinstance(e.tag, str):
             return
-        if e.tag == 'img': yield (e, e.get('src').encode('utf-8'))
+        if e.tag == 'img': yield (e, urllib.quote(urllib.unquote(e.get('src').encode('utf-8'))))
         for c in e.getchildren(): #e.iterchildren():
             for h in self._html_img_recursive(c):
                 yield h
@@ -172,7 +172,7 @@ class Analyzer(object) :
         url = url.encode('utf-8')
         url = urllib.quote(urllib.unquote(url[url.rfind('/')+1:]))
         elements = self._html_to_img()
-        element = next(((elem, u) for elem, u in elements if urllib.quote(u[u.rfind('/')+1:]) == url), None)
+        element = next(((elem, u) for elem, u in elements if u[u.rfind('/')+1:] == url), None)
 
         return element[0]
 
