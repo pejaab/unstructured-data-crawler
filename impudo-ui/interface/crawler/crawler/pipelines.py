@@ -7,6 +7,7 @@
 import scrapy
 from scrapy.pipelines.images import ImagesPipeline
 from dao import Dao
+import urllib
 import re
 
 class ImpudoImagesPipeline(ImagesPipeline):
@@ -15,12 +16,13 @@ class ImpudoImagesPipeline(ImagesPipeline):
     #Name download version
     def file_path(self, request, response=None, info=None):
         template_id = request.meta['template_id']
-        url = request.meta['url'].split('/')[-1]
-        url = url.split('=')[-1]
-        image_guid = request.url.split('/')[-1].lower()
+        url = urllib.unquote(request.meta['url']).split('/')[-1]
+        image_guid = urllib.unquote(request.url).split('/')[-1]
         image_guid = image_guid.split('?')[0]
-        return 'full/template_{}/{}_{}'.format(template_id, url, image_guid)
-        #return 'full/%s' % (image_guid)
+        image_guid = urllib.unquote(image_guid)
+        result = 'full/template_{}/{}_{}'.format(template_id, url, image_guid).lower()
+        result = re.sub('[ ]+', '', result)
+        return result
 
     def get_media_requests(self, item, info):
         for image_url in item['image_urls']:
