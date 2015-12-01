@@ -31,8 +31,11 @@ class Analyzer(object) :
             r (requests.models.Response): Response fetched from url.
             elem_tree (lxml.etree._ElementTree): Parsed element tree from url.
         """
+        headers = {
+            'User-agent': 'Mozilla/5.0'
+        }
         self.url = url
-        self.r = requests.get(url)
+        self.r = requests.get(url=url, headers=headers)
         self.r.raise_for_status()
         self.elem_tree = lxml.html.document_fromstring(self.r.text)
         self.check_list = []
@@ -153,8 +156,8 @@ class Analyzer(object) :
         """
         if e.tag in ["script", "style"] or not isinstance(e.tag, str):
             return
-        if e.tag == 'img': yield (e, e.get('src'))
-        for c in e.iterchildren():
+        if e.tag == 'img': yield (e, e.get('src').encode('utf-8'))
+        for c in e.getchildren(): #e.iterchildren():
             for h in self._html_img_recursive(c):
                 yield h
 
@@ -165,7 +168,7 @@ class Analyzer(object) :
         return elements
 
     def _find_img(self, url):
-
+        url = url.encode('utf-8')
         url = urllib.quote(urllib.unquote(url[url.rfind('/')+1:]))
         elements = self._html_to_img()
         element = next(((elem, u) for elem, u in elements if urllib.quote(u[u.rfind('/')+1:]) == url), None)
@@ -264,10 +267,13 @@ class Analyzer(object) :
         if not isinstance(elem.tag, str):
             return
         if elem.tag == 'img':
-            yield self._extend_url(elem.get('src'))
+            url = self._extend_url(elem.get('src'))
+            if url is not None:
+                yield url
         for e in elem.iterchildren():
             for h in self._find_descendant_imgs(e):
-                yield h
+                if h is not None:
+                    yield h
 
     def _get_img_size(self, img):
         response = requests.get(img)
@@ -298,7 +304,6 @@ class Analyzer(object) :
         return list(self._find_descendant_imgs(elements[0]))
 
     def analyze_img(self, link):
-
         elem = self._find_img(link)
         elem = elem.getparent() # to loose img elem
         elem = elem.getparent() # to access img from first top level
@@ -351,6 +356,8 @@ class Analyzer(object) :
         url_base = urlparse.urlparse(self.url)
         url_base = url_base.scheme + '://' + url_base.netloc
         url_extended = urlparse.urljoin(url_base, url)
+        if 'http' not in url_extended:
+            return None
         return url_extended
 
     def find_content(self, path):
