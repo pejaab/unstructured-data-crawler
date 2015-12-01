@@ -289,11 +289,11 @@ class Analyzer(object) :
             node_class, node_item, node_id, node_idx = node_attrib
             node_class_new = None
             if node_class:
-                search_str = self.class_contains(node, node_class)
+                search_str = self.attrib_contains(node, node_class, 'class')
             elif not node_class and node_item:
-                search_str = "//{0}[contains(concat(' ', normalize-space(@itemprop), ' '), '{1}')]".format(node, node_item)
+                search_str = self.attrib_contains(node, node_item, 'itemprop')
             elif not node_class and not node_item and node_id:
-                search_str = "//{0}[contains(concat(' ', normalize-space(@id), ' '), '{1}')]".format(node, node_id)
+                search_str = self.attrib_contains(node, node_id, 'id')
             else:
                 search_str = "//{0}".format(node)
             search_term.append(search_str)
@@ -562,16 +562,16 @@ class Analyzer(object) :
         return found_xpaths
 
 
-    def class_contains(self, node, class_name):
+    def attrib_contains(self, node, attrib, attrib_name):
 
-        #match = re.search(r'(id-|post-)(\d+).*', class_name)
-        match = re.search(r'(-|_)(\d+).*', class_name)
+        #match = re.search(r'(id-|post-)(\d+).*', attrib)
+        match = re.search(r'(-|_)(\d+).*', attrib)
         article_id = match.group(2) if match else None
         if article_id:
-            class_name = class_name[:class_name.index(article_id)]
-        class_name = re.sub("[ \t\n]+", " ", class_name)
-        class_name = re.sub("[ \t\n]+$", "", class_name)
-        search_str = "//{0}[contains(concat(' ', normalize-space(@class), ' '), '{1}')]".format(node, class_name)
+            attrib = attrib[:attrib.index(article_id)]
+        attrib = re.sub("[ \t\n]+", " ", attrib)
+        attrib = re.sub("[ \t\n]+$", "", attrib)
+        search_str = "//{}[contains(concat(' ', normalize-space(@{}), ' '), '{}')]".format(node, attrib_name, attrib)
         return search_str
 
     def search(self, path):
@@ -583,11 +583,11 @@ class Analyzer(object) :
             node_class, node_item, node_id, node_idx = node_attrib
             node_class_new = None
             if node_class:
-                search_str = self.class_contains(node, node_class)
+                search_str = self.attrib_contains(node, node_class, 'class')
             elif not node_class and node_item:
-                search_str = "//{0}[contains(concat(' ', normalize-space(@itemprop), ' '), '{1}')]".format(node, node_item)
+                search_str = self.attrib_contains(node, node_item, 'itemprop')
             elif not node_class and not node_item and node_id:
-                search_str = "//{0}[contains(concat(' ', normalize-space(@id), ' '), '{1}')]".format(node, node_id)
+                search_str = self.attrib_contains(node, node_id, 'id')
             else:
                 search_str = "//{0}".format(node)
             search_term.append(search_str)
