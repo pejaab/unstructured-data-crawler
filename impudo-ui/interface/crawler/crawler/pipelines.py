@@ -17,7 +17,8 @@ class ImpudoImagesPipeline(ImagesPipeline):
         template_id = request.meta['template_id']
         url = request.meta['url'].split('/')[-1]
         url = url.split('=')[-1]
-        image_guid = request.url.split('/')[-1]
+        image_guid = request.url.split('/')[-1].lower()
+        image_guid = image_guid.split('?')[0]
         return 'full/template_{}/{}_{}'.format(template_id, url, image_guid)
         #return 'full/%s' % (image_guid)
 
