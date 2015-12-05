@@ -134,15 +134,14 @@ class Analyzer(object) :
         text_map = {}
         for e,t in elements:
             t = re.sub("[ \r\t\n\\xa0]+", " ", t)
-            if kill_whitespace:
-                t = re.sub("^ +", "", t)
+            t = re.sub("^ +", "", t)
+            t = re.sub(" +$", "", t)
             if not t:
                 continue
-            kill_whitespace = (t[-1] == " ")
             text_map[len(text)] = e
-            text += t.lower()
+            text += t.lower() + " "
 
-        return text, text_map
+        return text[:-1], text_map
 
 
     def _html_img_recursive(self, e):
@@ -179,24 +178,6 @@ class Analyzer(object) :
     def find_img_url(self, url):
         return self._find_img(url).get('src')
 
-    def _index(self, parent, child):
-
-        same = 1
-        for i in child.iter(child.tag):
-            same += 1
-
-        if same > 1:
-
-            prev = 1
-            for i in child.itersiblings(child.tag, preceding=True):
-                prev += 1
-            return prev
-        else:
-            prev = 1
-            for i in child.itersiblings(preceding=True):
-                prev += 1
-            return prev
-
     def _find_all_paths(self, text_map):
 
         result = []
@@ -207,8 +188,7 @@ class Analyzer(object) :
             node = item
             while node.tag != 'html':
                 parent = node.getparent()
-                idx = self._index(parent, node)
-                path.append((node.tag, [node.get('class'), node.get('itemprop'), node.get('id'), idx]))
+                path.append((node.tag, [node.get('class'), node.get('itemprop'), node.get('id')]))
                 node = parent
             content = self.find_content(path)
             if not content:
@@ -244,9 +224,8 @@ class Analyzer(object) :
         path = []
         while elem.tag != 'html':
             parent = elem.getparent()
-            idx = self._index(parent, elem)
 
-            path.append((elem.tag, [elem.get('class'), elem.get('itemprop'), elem.get('id'), idx]))
+            path.append((elem.tag, [elem.get('class'), elem.get('itemprop'), elem.get('id')]))
             elem = parent
 
         return path
@@ -257,9 +236,8 @@ class Analyzer(object) :
         path = []
         while elem.tag != 'html':
             parent = elem.getparent()
-            idx = self._index(parent, elem)
 
-            path.append((elem.tag, [elem.get('class'), elem.get('itemprop'), elem.get('id'), idx]))
+            path.append((elem.tag, [elem.get('class'), elem.get('itemprop'), elem.get('id')]))
             elem = parent
 
         return path
@@ -286,7 +264,7 @@ class Analyzer(object) :
         search_term = []
         while len(path) > 0:
             node, node_attrib = path.pop()
-            node_class, node_item, node_id, node_idx = node_attrib
+            node_class, node_item, node_id = node_attrib
             node_class_new = None
             if node_class:
                 search_str = self.attrib_contains(node, node_class, 'class')
@@ -295,7 +273,7 @@ class Analyzer(object) :
             elif not node_class and not node_item and node_id:
                 search_str = self.attrib_contains(node, node_id, 'id')
             else:
-                search_str = "//{0}".format(node)
+                search_str = "//{}".format(node)
             search_term.append(search_str)
         search_term = ''.join(search_term)
 
@@ -365,7 +343,7 @@ class Analyzer(object) :
         """
         elements = self.search(path[:])
         result = ''
-        if not elements:
+        if elements is None:
             return None
         for elem in elements:
             result += '\n' + self._html_to_text(elem)
@@ -564,7 +542,6 @@ class Analyzer(object) :
 
     def attrib_contains(self, node, attrib, attrib_name):
 
-        #match = re.search(r'(id-|post-)(\d+).*', attrib)
         match = re.search(r'(-|_)(\d+).*', attrib)
         article_id = match.group(2) if match else None
         if article_id:
@@ -580,7 +557,7 @@ class Analyzer(object) :
         search_term = []
         while len(path) > 0:
             node, node_attrib = path.pop()
-            node_class, node_item, node_id, node_idx = node_attrib
+            node_class, node_item, node_id = node_attrib
             node_class_new = None
             if node_class:
                 search_str = self.attrib_contains(node, node_class, 'class')
@@ -593,12 +570,7 @@ class Analyzer(object) :
             search_term.append(search_str)
 
         search_term = ''.join(search_term)
-
         elements = tree.xpath(search_term)
-        if len(elements) == 1:
-            return elements
-        elif len(elements) > 1:
-            parent = elements[0].getparent()
-            return parent
-        else:
+        if len(elements) < 1:
             return None
+        return elements
