@@ -37,7 +37,7 @@ class Analyzer(object) :
         self.url = url
         self.r = requests.get(url=url, headers=headers)
         self.r.raise_for_status()
-        self.elem_tree = lxml.html.document_fromstring(self.r.text)
+        self.elem_tree = lxml.html.document_fromstring(self.r.content).xpath('//body')[0]
         self.elem_tree.make_links_absolute(url)
         self.check_list = []
 
@@ -107,7 +107,7 @@ class Analyzer(object) :
         yield (e, e.tail)
 
 
-    def _html_to_textmap(self, html):
+    def _html_to_textmap(self):
         """
         Generates the text of a website by cleaning the html tags and a mapping between element and text.
 
@@ -126,9 +126,7 @@ class Analyzer(object) :
             str: Cleaned text of website
         """
 
-        html = html.replace("\r\n","\n")
-        body = self.elem_tree.xpath('//body')[0]
-        elements = list(filter(lambda x: x[1] is not None, self._html_textmap_recursive(body)))
+        elements = list(filter(lambda x: x[1] is not None, self._html_textmap_recursive(self.elem_tree)))
         kill_whitespace = False
         text = ""
         text_map = {}
@@ -471,7 +469,7 @@ class Analyzer(object) :
             i_section ():
             i_paths ():
         """
-        text, text_map = self._html_to_textmap(self.r.text)
+        text, text_map = self._html_to_textmap()
         i_paths = []
         if not search_string:
             ordered_text_map = collections.OrderedDict(sorted(text_map.items()))
