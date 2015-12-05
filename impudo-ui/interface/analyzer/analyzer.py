@@ -32,7 +32,7 @@ class Analyzer(object) :
             elem_tree (lxml.etree._ElementTree): Parsed element tree from url.
         """
         headers = {
-            'User-agent': 'Mozilla/5.0'
+            'User-agent': 'python-requests/2.8.1'
         }
         self.url = url
         self.r = requests.get(url=url, headers=headers)
@@ -541,9 +541,8 @@ class Analyzer(object) :
 
 
     def attrib_contains(self, node, attrib, attrib_name):
-
-        match = re.search(r'(-|_)(\d+).*', attrib)
-        article_id = match.group(2) if match else None
+        match = re.search(r'[-|_](\d+)|id(\d+[\d\w]+).*', attrib)
+        article_id = match.group() if match else None
         if article_id:
             attrib = attrib[:attrib.index(article_id)]
         attrib = re.sub("[ \t\n]+", " ", attrib)
