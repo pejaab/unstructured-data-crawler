@@ -156,7 +156,7 @@ class ImpudoSpider(CrawlSpider):
             content = ''
         if content:
             print title.encode('utf-8'), response.url, content.encode('utf-8')
-
+            '''
             # get image urls
             image_urls = []
             for xpath in self.img_xpath:
@@ -170,7 +170,7 @@ class ImpudoSpider(CrawlSpider):
 
             for img in image_urls:
                 print(img)
-
+            '''
             #convert to utf8
             title = title.encode('utf-8')
             content = content.encode('utf-8')
