@@ -65,7 +65,7 @@ class TemplateForm(forms.models.ModelForm):
         for path, content in paths:
             Crawler.objects.create(template= self.instance, xpath= path, content= content, url= url)
 
-        CrawlerImg.objects.create(template= self.instance, url= analyzer.find_img_url(img_url))
+        #CrawlerImg.objects.create(template= self.instance, url= analyzer.find_img_url(img_url))
 
         for path in img_paths:
             CrawlerImgPath.objects.create(template= self.instance, xpath= path)
