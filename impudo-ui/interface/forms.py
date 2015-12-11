@@ -79,5 +79,5 @@ class TemplateForm(forms.models.ModelForm):
     def save_active_imgs(self, active):
         for img in active:
             CrawlerImg.objects.create(template= self.instance, xpath= img.xpath,
-                                      img= img.img, active= 1)
+                                      path= img.path, active= 1)
 
