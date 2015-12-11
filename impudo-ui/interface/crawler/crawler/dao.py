@@ -13,7 +13,7 @@ class Dao(object) :
     _table_record = 'interface_record'
     _table_record_details = 'interface_record_details'
     _table_image = 'interface_image'
-    _table_crawlerimgpath = 'interface_crawlerimgpath'
+    _table_crawlerimg = 'interface_crawlerimg'
     _table_crawler = 'interface_crawler'
     _table_rules = 'impudo_rules'
 
@@ -42,7 +42,7 @@ class Dao(object) :
         return self.cursor
 
     def get_img_xpath(self, template_id):
-        sql = 'SELECT xpath from {0} where template_id={1} order by id asc'.format(self._table_crawlerimgpath, template_id)
+        sql = 'SELECT xpath from {0} where template_id={1} order by id asc'.format(self._table_crawlerimg, template_id)
         self.cursor.execute(sql)
         return self.cursor
 

@@ -41,7 +41,7 @@ def view_template(request, template_id):
                         {'form': form, 'item': item,
                          'not_selected_error': NO_SELECTION_ERROR})
                 else:
-                    #scrape.delay(template_id)
+                    scrape.delay(template_id)
                     return render(request, 'home.html', {'form': TemplateForm()})
 
             # Delete xpath records before re-searching them
