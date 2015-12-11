@@ -31,7 +31,7 @@
       <div class='col-xs-5'></div>
       <div class='col-xs-5'>
         {% for img in item.crawlerimg_set.all %}
-        <label><input type='checkbox' name='img' value={{img.id}}>{{ img.img }}<br></label>
+        <label><input type='checkbox' name='img' value={{ img.id }}><img src={{ img.path }} width="100"/><br></label>
         {% endfor %}
       </div>
     </div>

@@ -47,9 +47,6 @@ class CrawlerImg(models.Model):
     path = models.CharField(max_length=500)
     active = models.IntegerField(default=0)
 
-    def img(self):
-        return u'<img src="../../../../media/{}" width="100"/>'.format(self.path)
-
 class Image(models.Model):
     '''
     # after: https://docs.djangoproject.com/en/dev/ref/models/fields/#django.db.models.FileField.upload%5Fto
