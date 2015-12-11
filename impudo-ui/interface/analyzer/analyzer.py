@@ -10,6 +10,10 @@ import collections
 from PIL import Image
 from StringIO import StringIO
 
+import os
+#BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 class Analyzer(object) :
 
     html_block_elements = {
@@ -18,6 +22,8 @@ class Analyzer(object) :
         "hgroup", "hr", "li", "noscript", "ol", "output", "p", "pre", "section", "table",
         "tr", "th", "td", "tfoot", "thead", "ul", "br",
         }
+
+    words_to_remove = ['png', 'gif', 'logo', 'facebook', 'pinterest', 'linkedin']
 
     def __init__(self, url):
         """
@@ -154,15 +160,23 @@ class Analyzer(object) :
         """
         if e.tag in ["script", "style"] or not isinstance(e.tag, str):
             return
-        if e.tag == 'img': yield (e, urllib.quote(urllib.unquote(e.get('src').encode('utf-8'))))
-        for c in e.getchildren(): #e.iterchildren():
+        if e.tag == 'img':
+            url = e.get('src')
+            if url is not None:
+                if 'http' in url:
+                    for word in self.words_to_remove:
+                        if word in url.lower():
+                            return
+                    size = self._get_img_size(url)
+                    if size:
+                        yield (e, url, size)
+        for c in e.iterchildren():
             for h in self._html_img_recursive(c):
                 yield h
 
     def _html_to_img(self):
 
-        body = self.elem_tree.xpath('//body')[0]
-        elements = list(self._html_img_recursive(body))
+        elements = list(self._html_img_recursive(self.elem_tree))
         return elements
 
     def _find_img(self, url):
@@ -184,10 +198,11 @@ class Analyzer(object) :
         for _,item in text_map.items():
             path = []
             node = item
-            while node.tag != 'html':
+            while node.tag != 'body':
                 parent = node.getparent()
                 path.append((node.tag, [node.get('class'), node.get('itemprop'), node.get('id')]))
                 node = parent
+            path.append(('body', [None, None, None]))
             content = self.find_content(path)
             if not content:
                 continue
@@ -220,23 +235,25 @@ class Analyzer(object) :
         tree = etree.ElementTree(self.elem_tree)
         elem = text_map[index]
         path = []
-        while elem.tag != 'html':
+        while elem.tag != 'body':
             parent = elem.getparent()
 
             path.append((elem.tag, [elem.get('class'), elem.get('itemprop'), elem.get('id')]))
             elem = parent
+        path.append(('body', [None, None, None]))
 
         return path
 
-    def _find_img_path(self, elem):
+    def _find_img_path(self, elem, num_to_forget):
 
         tree = etree.ElementTree(self.elem_tree)
         path = []
         while elem.tag != 'html':
             parent = elem.getparent()
-
-            path.append((elem.tag, [elem.get('class'), elem.get('itemprop'), elem.get('id')]))
+            if num_to_forget < 0:
+                path.append((elem.tag, [elem.get('class'), elem.get('itemprop'), elem.get('id')]))
             elem = parent
+            num_to_forget -= 1
 
         return path
 
@@ -246,6 +263,9 @@ class Analyzer(object) :
         if elem.tag == 'img':
             url = elem.get('src')
             if 'http' in url:
+                for word in self.words_to_remove:
+                    if word in url.lower():
+                        return
                 yield url
         for e in elem.iterchildren():
             for h in self._find_descendant_imgs(e):
@@ -253,8 +273,22 @@ class Analyzer(object) :
 
     def _get_img_size(self, img):
         response = requests.get(img)
-        img_child = Image.open(StringIO(response.content))
+        try:
+            img_child = Image.open(StringIO(response.content))
+        except IOError:
+            return None
         return img_child.size
+
+    def download_img(self, img):
+        response = requests.get(img)
+        name = img.split('/')[-1]
+        path = os.path.join(os.path.dirname(BASE_DIR), 'media', 'thumbnail')
+        try:
+            img = Image.open(StringIO(response.content))
+        except IOError:
+            return None
+        img.save(path + '/' + name, 'jpeg')
+        return 'thumbnail/' + name
 
     def search_imgs(self, path):
 
@@ -274,57 +308,92 @@ class Analyzer(object) :
                 search_str = "//{}".format(node)
             search_term.append(search_str)
         search_term = ''.join(search_term)
-
         elements = tree.xpath(search_term)
+        result = []
+        for elem in elements:
+            imgs = list(self._find_descendant_imgs(elem))
+            if imgs:
+                result += imgs
+        return result
 
-        return list(self._find_descendant_imgs(elements[0]))
+    def _does_not_belong(self, img):
+        _, u, s = img
+        keep = False
+        width, height = s
+        if width <= 100 and height <= 100:
+            return False
+        if width / height <= 1/2 or width / height >= 2/1:
+            return False
+        return True
 
-    def analyze_img(self, link):
-        elem = self._find_img(link)
-        elem = elem.getparent() # to loose img elem
-        elem = elem.getparent() # to access img from first top level
+    def _remove_imgs(self, imgs):
+        result = []
+        for img in imgs:
+            keep = self._does_not_belong(img)
+            if keep:
+                result.append(img)
+        return result
 
-        imgs = list(self._find_descendant_imgs(elem))
-        width, height = self._get_img_size(imgs[0])
-        elem_new = elem
-        imgs_new = []
-        result_elems = []
-        for _ in range(0, 2):
-            elem_new = elem_new.getparent()
-            imgs_new = list(self._find_descendant_imgs(elem_new))
-            if len(imgs_new) > len(imgs):
-                children = list(elem_new)
-                for child in children:
-                    imgs_child = list(self._find_descendant_imgs(child))
-                    if len(imgs_child) == 0:
-                        continue
-                    width_child, height_child = self._get_img_size(imgs_child[0])
-                    if width > width_child or height > height_child:
-                        pass
-                    else:
-                        result_elems.append(child)
-                break
+    def _find_roots(self, paths):
+        reduced_paths = collections.OrderedDict()
+        if len(paths) > 20:
+            paths = paths[:20]
+        for i in range(len(paths)):
+            found = False
+            path_copy = paths[:]
+            path, e = paths[i]
+            path_copy.pop(i)
+            # shorten path until more than one image are on the same path
+            j = 0
+            while True:
+                path = path[:path.rfind('/')]
+                for p,_ in path_copy:
+                    if path in p:
+                        found = True
+                j += 1
+                if found:
+                    break
 
-        if len(imgs_new) > len(imgs):
-            elems = result_elems
-        else:
-            children = list(elem)
-            for child in children:
-                imgs_child = list(self._find_descendant_imgs(child))
-                if len(imgs_child) == 0:
-                    continue
-                width_child, height_child = self._get_img_size(imgs_child[0])
-                if width > width_child or height > height_child:
-                    pass
-                else:
-                    result_elems.append(child)
-            elems = result_elems
+            if not reduced_paths.get(path):
+                reduced_paths[path] = (e, j)
 
+        if len(reduced_paths) == 1:
+            return reduced_paths
+
+        paths = list(reduced_paths)
+        for i in range(len(paths)-1):
+            path_1 = reduced_paths[paths[i]]
+            path_2 = reduced_paths[paths[i+1]]
+            if path_1 in path_2:
+                e, j = reduced_paths[paths[i]]
+                j -= 2
+                reduced_paths[paths[i]] = (e, j)
+            elif path_2 in path_1:
+                e, j = reduced_paths[paths[i+1]]
+                j -= 2
+                reduced_paths[paths[i]] = (e, j)
+
+        return reduced_paths
+
+    def analyze_img(self):
+        imgs = self._html_to_img()
+        imgs = self._remove_imgs(imgs)
         paths = []
-        for elem in elems:
-            paths.append(self._find_img_path(elem))
+        result = []
+        tree = etree.ElementTree(self.elem_tree)
+        for e,_,_ in imgs:
+            path = tree.getpath(e)
+            paths.append((path, e))
+        if len(paths) <= 1:
+            roots = collections.OrderedDict()
+            roots[paths[0][0]] = (paths[0][1], 0)
+        else:
+            roots = self._find_roots(paths)
+        for path, elem in roots.items():
+            e, num = elem
+            result.append(self._find_img_path(e, num))
 
-        return paths
+        return result
 
     def find_content(self, path):
         """

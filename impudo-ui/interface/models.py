@@ -1,6 +1,8 @@
 from django.core.urlresolvers import reverse
 from django.db import models
 
+from StringIO import StringIO
+from PIL import Image as Img
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -9,7 +11,6 @@ class Template(models.Model):
     url_abbr = models.TextField(verbose_name='Name')
     url = models.URLField()
     desc = models.TextField(verbose_name='Description')
-    img = models.TextField(verbose_name='Image Url')
 
     def __str__(self):
         return self.url_abbr
@@ -42,11 +43,12 @@ class Record(models.Model):
 
 class CrawlerImg(models.Model):
     template = models.ForeignKey(Template, default=None)
-    url = models.TextField()
-
-class CrawlerImgPath(models.Model):
-    template = models.ForeignKey(Template, default=None)
     xpath = models.TextField()
+    path = models.CharField(max_length=500)
+    active = models.IntegerField(default=0)
+
+    def img(self):
+        return u'<img src="../../../../media/{}" width="100"/>'.format(self.path)
 
 class Image(models.Model):
     '''
@@ -59,7 +61,6 @@ class Image(models.Model):
     path = models.CharField(max_length=500)
 
     def img(self):
-        path = os.path.join(os.path.dirname(BASE_DIR), 'media')
         return u'<img src="../../../../media/%s" width="100"/>' % (self.path)
     img.short_description = 'Image'
     img.allow_tags = True

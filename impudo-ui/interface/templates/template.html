@@ -27,9 +27,13 @@
       </div>
     </div>
     <div class='row top-buffer'>
-      <div class='col-xs-2'><h5>Example URL of Images to Scrape</h5></div>
-      <div class='col-xs-5'>{{ form.img }}</div>
-      <div class='col-xs-5'>{{ img.url }}</div>
+      <div class='col-xs-2'><h5>Images to Scrape</h5></div>
+      <div class='col-xs-5'></div>
+      <div class='col-xs-5'>
+        {% for img in item.crawlerimg_set.all %}
+        <label><input type='checkbox' name='img' value={{img.id}}>{{ img.img }}<br></label>
+        {% endfor %}
+      </div>
     </div>
     <div class='row top-buffer'>
       <div class='col-xs-2'></div>
@@ -46,7 +50,6 @@
         <div class='form-group has-error'>
           <span class='help-block'>{{ form.url.errors }}</span>
           <span class='help-block'>{{ form.desc.errors }}</span>
-          <span class='help-block'>{{ form.img.errors }}</span>
           <span class='help-block'>{{ not_selected_error }}</span>
         </div>
       </div>

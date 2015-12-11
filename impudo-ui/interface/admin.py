@@ -49,8 +49,8 @@ class CrawlerInline(admin.TabularInline):
 
 
 class TemplateAdmin(admin.ModelAdmin):
-    readonly_fields = ('id', 'url_abbr', 'url', 'desc', 'img',)
-    fields = ('id', 'url_abbr', 'url', 'img', 'desc')
+    readonly_fields = ('id', 'url_abbr', 'url', 'desc',)
+    fields = ('id', 'url_abbr', 'url', 'desc')
     list_display = ('url_abbr', 'desc',)
 
     actions = ('dispatch_crawler',)

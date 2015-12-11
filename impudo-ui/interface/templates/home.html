@@ -11,15 +11,12 @@
     <br>
     {{ form.desc }}
     <br>
-    {{ form.img }}
-    <br>
     <input id='id_submit' type='submit' value='Generate crawler template' class='btn btn-default'/>
     {% csrf_token %}
     {% if form.errors %}
       <div class='form-group has-error'>
         <span class='help-block'>{{ form.url.errors }}</span>
         <span class='help-block'>{{ form.desc.errors }}</span>
-        <span class='help-block'>{{ form.img.errors }}</span>
       </div>
     {% endif %}
   </form>

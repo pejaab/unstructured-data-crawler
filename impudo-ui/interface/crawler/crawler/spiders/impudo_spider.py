@@ -181,7 +181,8 @@ class ImpudoSpider(CrawlSpider):
             p['title'] = title
             p['content'] = content[1:]
             p['url'] = response.url
-            p['image_urls'] = image_urls
+            #p['image_urls'] = image_urls
+            p['image_urls'] = ''
             yield p
         else:
             self.logger.warning('No content found on %s in domain %s', response.url, self.allowed_domains[0])
