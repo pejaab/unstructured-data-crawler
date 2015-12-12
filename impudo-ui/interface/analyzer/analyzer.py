@@ -1,3 +1,4 @@
+from __future__ import division
 import lxml.html
 from lxml import etree
 #import html as html_tools
@@ -322,6 +323,7 @@ class Analyzer(object) :
         width, height = s
         if width <= 100 and height <= 100:
             return False
+
         if width / height <= 1/2 or width / height >= 2/1:
             return False
         return True
@@ -377,7 +379,9 @@ class Analyzer(object) :
 
     def analyze_img(self):
         imgs = self._html_to_img()
+        print(imgs)
         imgs = self._remove_imgs(imgs)
+        print(imgs)
         paths = []
         result = []
         tree = etree.ElementTree(self.elem_tree)
