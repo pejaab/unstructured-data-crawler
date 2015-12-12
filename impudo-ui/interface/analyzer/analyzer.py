@@ -391,7 +391,9 @@ class Analyzer(object) :
             roots = self._find_roots(paths)
         for path, elem in roots.items():
             e, num = elem
-            result.append(self._find_img_path(e, num))
+            path = self._find_img_path(e, num)
+            if path:
+                result.append(path)
 
         return result
 
