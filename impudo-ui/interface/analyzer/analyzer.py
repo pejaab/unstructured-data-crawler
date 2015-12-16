@@ -251,7 +251,7 @@ class Analyzer(object) :
         path = []
         while elem.tag != 'html':
             parent = elem.getparent()
-            if num_to_forget < 0:
+            if num_to_forget <= 0:
                 path.append((elem.tag, [elem.get('class'), elem.get('itemprop'), elem.get('id')]))
             elem = parent
             num_to_forget -= 1
@@ -354,7 +354,7 @@ class Analyzer(object) :
                     if path in p:
                         found = True
                 j += 1
-                if found:
+                if found or j > 1:
                     break
 
             if not reduced_paths.get(path):
@@ -380,18 +380,18 @@ class Analyzer(object) :
 
     def analyze_img(self):
         imgs = self._html_to_img()
-        print(imgs)
         imgs = self._remove_imgs(imgs)
-        print(imgs)
         paths = []
         result = []
         tree = etree.ElementTree(self.elem_tree)
         for e,_,_ in imgs:
             path = tree.getpath(e)
             paths.append((path, e))
-        if len(paths) <= 1:
+        if len(paths) == 1:
             roots = collections.OrderedDict()
             roots[paths[0][0]] = (paths[0][1], 0)
+        elif len(paths) < 1:
+            print('No pictures found!')
         else:
             roots = self._find_roots(paths)
         for path, elem in roots.items():
@@ -556,63 +556,6 @@ class Analyzer(object) :
             diff, i_section = self._find_text(text, search_string)
             i_paths = self._find_paths(i_section, len(text), text_map)
         return i_paths
-
-    def eliminate_begin_and_end(self, xpaths, xpath_begin, xpath_end):
-        path_begin, content_begin = xpath_begin
-        path_end, content_end = xpath_end
-        idx_begin = [idx for idx, tup in enumerate(xpaths) if tup[1] == content_begin]
-        idx_end = [idx for idx, tup in enumerate(xpaths) if tup[1] == content_end]
-        if len(idx_end) != 1:
-            content_end = self._html_to_text(self.search(path_end[:])[0])
-            idx_end = [idx for idx, tup in enumerate(xpaths) if tup[1] == content_end]
-            if len(idx_end) == 0:
-                return False
-        for i in range(len(xpaths)-1, idx_end[0]-1, -1):
-            xpaths.pop()
-        if len(idx_begin) != 1:
-            content_begin = self._html_to_text(self.search(path_begin[:])[0])
-            idx_begin = [idx for idx, tup in enumerate(xpaths) if tup[1] == content_begin]
-            if len(idx_begin) == 0:
-                return False
-        for i in range(idx_begin[0], -1, -1):
-            xpaths.pop(i)
-
-        return True
-
-
-    def eliminate_actives(self, all_paths, actives):
-        """
-        After saving active records as actives, they are deleted from pool, so not to save them twice.
-        """
-        for tup in actives:
-            all_paths.remove(tup)
-
-    def eliminate_xpaths(self, stored_xpaths, found_xpaths, xpath_begin, xpath_end):
-
-        self.eliminate_begin_and_end(found_xpaths, xpath_begin, xpath_end)
-
-        for path in stored_xpaths:
-            try:
-                found_xpaths.remove(path)
-            except ValueError as _:
-                pass
-
-        delete_paths = []
-        for path in found_xpaths:
-            new_path = path
-            while new_path:
-                new_path = new_path[:new_path.rfind('/')]
-                if new_path in found_xpaths:
-                    delete_paths.append(path)
-
-        for path in delete_paths:
-            try:
-                found_xpaths.remove(path)
-            except ValueError as _:
-                pass
-
-        return found_xpaths
-
 
     def attrib_contains(self, node, attrib, attrib_name):
         match = re.search(r'[-|_](\d+)|id(\d+[\d\w]+).*', attrib)

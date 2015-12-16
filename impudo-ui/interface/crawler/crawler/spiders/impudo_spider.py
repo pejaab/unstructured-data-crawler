@@ -159,9 +159,7 @@ class ImpudoSpider(CrawlSpider):
             # get image urls
             image_urls = []
             for xpath in self.img_xpath:
-                img_url = a.search_imgs(xpath[:])
-                if img_url is not None:
-                    image_urls += img_url
+                image_urls += a.search_imgs(xpath[:])
             # clean out duplicates
             result = []
             for img in image_urls:
