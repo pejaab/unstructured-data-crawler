@@ -341,40 +341,23 @@ class Analyzer(object) :
         reduced_paths = collections.OrderedDict()
         if len(paths) > 20:
             paths = paths[:20]
-        for i in range(len(paths)):
-            found = False
-            path_copy = paths[:]
-            path, e = paths[i]
-            path_copy.pop(i)
-            # shorten path until more than one image are on the same path
+        for p,e in paths:
+            p_copy = p[:]
+            p_copy = p_copy.split('/')
             j = 0
             while True:
-                path = path[:path.rfind('/')]
-                for p,_ in path_copy:
-                    if path in p:
-                        found = True
+                p_copy.pop()
                 j += 1
-                if found or j > 1:
+                if 'li' in p_copy[-1]:
+                    p_copy.pop()
+                    j += 1
                     break
-
-            if not reduced_paths.get(path):
-                reduced_paths[path] = (e, j)
-
-        if len(reduced_paths) == 1:
-            return reduced_paths
-
-        paths = list(reduced_paths)
-        for i in range(len(paths)-1):
-            path_1 = reduced_paths[paths[i]]
-            path_2 = reduced_paths[paths[i+1]]
-            if path_1 in path_2:
-                e, j = reduced_paths[paths[i]]
-                j -= 2
-                reduced_paths[paths[i]] = (e, j)
-            elif path_2 in path_1:
-                e, j = reduced_paths[paths[i+1]]
-                j -= 2
-                reduced_paths[paths[i]] = (e, j)
+                if 'div' in p_copy[-1]:
+                    break
+            p_copy = ('/').join(p_copy)
+            print(p_copy)
+            if reduced_paths.get(p_copy) is None:
+                reduced_paths[p_copy] = (e,j)
 
         return reduced_paths
 
@@ -385,7 +368,7 @@ class Analyzer(object) :
         result = []
         tree = etree.ElementTree(self.elem_tree)
         for e,_,_ in imgs:
-            path = tree.getpath(e)
+            path = tree.getelementpath(e)
             paths.append((path, e))
         if len(paths) == 1:
             roots = collections.OrderedDict()
