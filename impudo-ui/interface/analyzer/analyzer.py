@@ -373,15 +373,13 @@ class Analyzer(object) :
         if len(paths) == 1:
             roots = collections.OrderedDict()
             roots[paths[0][0]] = (paths[0][1], 0)
-        elif len(paths) < 1:
-            print('No pictures found!')
-        else:
+        elif len(paths) > 1:
             roots = self._find_roots(paths)
         for path, elem in roots.items():
             e, num = elem
-            path = self._find_img_path(e, num)
-            if path:
-                result.append(path)
+            p = self._find_img_path(e, num)
+            if p and p not in result:
+                result.append(p)
 
         return result
 
