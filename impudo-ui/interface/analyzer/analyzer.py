@@ -322,9 +322,6 @@ class Analyzer(object) :
         _, u, s = img
         keep = False
         width, height = s
-        if width <= 100 and height <= 100:
-            return False
-
         if width / height <= 1/2 or width / height >= 2/1:
             return False
         return True
