@@ -282,8 +282,7 @@ class Analyzer(object) :
 
     def download_img(self, img):
         response = requests.get(img)
-        name = urllib.unquote(img).split('/')[-1]
-        name = name.split('?')[0]
+        name = urllib.unquote(img)
         name = hashlib.sha1(name).hexdigest()
         path = os.path.join(os.path.dirname(BASE_DIR), 'media', 'thumbnail')
         try:
