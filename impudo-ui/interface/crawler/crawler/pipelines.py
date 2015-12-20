@@ -9,6 +9,7 @@ from scrapy.pipelines.images import ImagesPipeline
 from dao import Dao
 import urllib
 import re
+import hashlib
 
 class ImpudoImagesPipeline(ImagesPipeline):
     d = Dao()
@@ -16,12 +17,11 @@ class ImpudoImagesPipeline(ImagesPipeline):
     #Name download version
     def file_path(self, request, response=None, info=None):
         template_id = request.meta['template_id']
-        url = urllib.unquote(request.meta['url']).split('/')[-1]
         image_guid = urllib.unquote(request.url).split('/')[-1]
         image_guid = image_guid.split('?')[0]
         image_guid = urllib.unquote(image_guid)
-        result = 'full/template_{}/{}_{}'.format(template_id, url, image_guid).lower()
-        result = re.sub('[ ]+', '', result)
+        image_guid = hashlib.sha1(image_guid).hexdigest()
+        result = 'full/template_{}/{}'.format(template_id, image_guid).lower()
         return result
 
     def get_media_requests(self, item, info):

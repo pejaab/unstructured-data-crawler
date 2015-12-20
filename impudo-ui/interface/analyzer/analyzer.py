@@ -10,7 +10,7 @@ import urllib
 import collections
 from PIL import Image
 from StringIO import StringIO
-
+import hashlib
 import os
 #BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -284,6 +284,7 @@ class Analyzer(object) :
         response = requests.get(img)
         name = urllib.unquote(img).split('/')[-1]
         name = name.split('?')[0]
+        name = hashlib.sha1(name).hexdigest()
         path = os.path.join(os.path.dirname(BASE_DIR), 'media', 'thumbnail')
         try:
             img = Image.open(StringIO(response.content))
@@ -352,7 +353,6 @@ class Analyzer(object) :
                 if 'div' in p_copy[-1]:
                     break
             p_copy = ('/').join(p_copy)
-            print(p_copy)
             if reduced_paths.get(p_copy) is None:
                 reduced_paths[p_copy] = (e,j)
 
