@@ -377,6 +377,16 @@ class Analyzer(object) :
             if p and p not in result:
                 result.append(p)
 
+        reduced_paths = []
+        for path in result:
+            reduced_paths.append(self.search_imgs(path[:]))
+        if len(reduced_paths) >= 2 and len(reduced_paths[0]) == 1:
+            main_img_name = reduced_paths[0][0].split('/')[-1]
+
+            # check if main image is contained in the succeeding image gallery
+            if main_img_name == reduced_paths[1][0].split('/')[-1]:
+                result = result[1:]
+
         return result
 
     def find_content(self, path):
