@@ -345,12 +345,16 @@ class Analyzer(object) :
             while True:
                 p_copy.pop()
                 j += 1
+                if len(p_copy) == 0:
+                    break
                 if 'li' in p_copy[-1]:
                     p_copy.pop()
                     j += 1
                     break
                 if 'div' in p_copy[-1]:
                     break
+            if len(p_copy) == 0:
+                continue
             p_copy = ('/').join(p_copy)
             if reduced_paths.get(p_copy) is None:
                 reduced_paths[p_copy] = (e,j)
