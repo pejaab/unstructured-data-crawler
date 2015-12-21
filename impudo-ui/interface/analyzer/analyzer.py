@@ -549,7 +549,7 @@ class Analyzer(object) :
         return i_paths
 
     def attrib_contains(self, node, attrib, attrib_name):
-        match = re.search(r'[-|_](\d+)|id(\d+[\d\w]+).*', attrib)
+        match = re.search(r'[-|_](\d+)|id([\d\w]+).*', attrib)
         article_id = match.group() if match else None
         if article_id:
             attrib = attrib[:attrib.index(article_id)]
