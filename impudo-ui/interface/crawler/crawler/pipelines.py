@@ -18,7 +18,7 @@ class ImpudoImagesPipeline(ImagesPipeline):
     def file_path(self, request, response=None, info=None):
         template_id = request.meta['template_id']
         image_guid = urllib.unquote(request.url)
-        image_guid = hashlib.sha1(image_guid).hexdigest()
+        image_guid = hashlib.sha1(image_guid.encode('utf-8')).hexdigest()
         result = 'full/template_{}/{}'.format(template_id, image_guid).lower()
         return result
 
