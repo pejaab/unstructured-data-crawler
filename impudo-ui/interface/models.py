@@ -1,11 +1,13 @@
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.dispatch import receiver
 
 from StringIO import StringIO
 from PIL import Image as Img
 import os
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+from impudo.settings import BASE_DIR
+from impudo.settings import MEDIA_ROOT
 
 class Template(models.Model):
     url_abbr = models.TextField(verbose_name='Name')
@@ -47,6 +49,7 @@ class CrawlerImg(models.Model):
     path = models.CharField(max_length=500)
     active = models.IntegerField(default=0)
 
+
 class Image(models.Model):
     '''
     # after: https://docs.djangoproject.com/en/dev/ref/models/fields/#django.db.models.FileField.upload%5Fto
@@ -65,3 +68,16 @@ class Image(models.Model):
     def __str__(self):
         return str(self.pk)
 
+@receiver(models.signals.post_delete, sender=CrawlerImg)
+def CrawlerImg_delete(sender, instance, *args, **kwargs):
+    try:
+        os.remove(os.path.join(MEDIA_ROOT, instance.path))
+    except OSError:
+        pass
+
+@receiver(models.signals.post_delete, sender=Image)
+def Image_delete(sender, instance, *args, **kwargs):
+    try:
+        os.remove(os.path.join(MEDIA_ROOT, instance.path))
+    except OSError:
+        pass
