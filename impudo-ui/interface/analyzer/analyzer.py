@@ -238,8 +238,8 @@ class Analyzer(object) :
         path = []
         while elem.tag != 'body':
             parent = elem.getparent()
-
-            path.append((elem.tag, [elem.get('class'), elem.get('itemprop'), elem.get('id')]))
+            cls_attrib = ' '.join(elem.get('class').split(' ')[:2]) if elem.get('class') else None
+            path.append((elem.tag, [cls_attrib, elem.get('itemprop'), elem.get('id')]))
             elem = parent
         path.append(('body', [None, None, None]))
 
@@ -249,13 +249,14 @@ class Analyzer(object) :
 
         tree = etree.ElementTree(self.elem_tree)
         path = []
-        while elem.tag != 'html':
+        while elem.tag != 'body':
             parent = elem.getparent()
             if num_to_forget <= 0:
-                path.append((elem.tag, [elem.get('class'), elem.get('itemprop'), elem.get('id')]))
+                cls_attrib = ' '.join(elem.get('class').split(' ')[:2]) if elem.get('class') else None
+                path.append((elem.tag, [cls_attrib, elem.get('itemprop'), elem.get('id')]))
             elem = parent
             num_to_forget -= 1
-
+        path.append(('body', [None, None, None]))
         return path
 
     def _find_descendant_imgs(self, elem):
@@ -370,10 +371,7 @@ class Analyzer(object) :
         for e,_,_ in imgs:
             path = tree.getelementpath(e)
             paths.append((path, e))
-        if len(paths) == 1:
-            roots = collections.OrderedDict()
-            roots[paths[0][0]] = (paths[0][1], 0)
-        elif len(paths) > 1:
+        if len(paths) > 1:
             roots = self._find_roots(paths)
         for path, elem in roots.items():
             e, num = elem
