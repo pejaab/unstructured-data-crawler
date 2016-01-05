@@ -376,7 +376,9 @@ class Analyzer(object) :
         for e,_,_ in imgs:
             path = tree.getelementpath(e)
             paths.append((path, e))
-        if len(paths) > 1:
+        if len(paths) < 1:
+            return []
+        else:
             roots = self._find_roots(paths)
         for path, elem in roots.items():
             e, num = elem
