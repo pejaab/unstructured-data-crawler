@@ -13,7 +13,7 @@ class Dao(object) :
     _table_record = 'interface_record'
     _table_record_details = 'interface_record_details'
     _table_image = 'interface_image'
-    _table_crawlerimg = 'interface_crawlerimg'
+    _table_crawlerimg = 'interface_crawlerimgpath'
     _table_crawler = 'interface_crawler'
     _table_rules = 'impudo_rules'
 
