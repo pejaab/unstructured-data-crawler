@@ -8,6 +8,7 @@ import requests
 import urlparse
 import urllib
 import collections
+import ftfy
 from PIL import Image
 from StringIO import StringIO
 import hashlib
@@ -62,12 +63,16 @@ class Analyzer(object) :
         if e.tag in ["script", "style"] or not isinstance(e.tag, str):
             return
         if e.tag in self.html_block_elements: yield "\n"
+	if e.text and isinstance(e.text,unicode):
+	    e.text = ftfy.fix_encoding(e.text)
         yield e.text
         for c in e.iterchildren():
             #yield from self._html_text_recursive(c)
             for h in self._html_text_recursive(c):
                 yield h
         if e.tag in self.html_block_elements: yield "\n"
+	if e.tail and isinstance (e.tail,unicode):
+	    e.tail = ftfy.fix_encoding(e.tail)
         yield e.tail
 
 
