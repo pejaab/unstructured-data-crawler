@@ -3,7 +3,7 @@ import re
 import ast
 from django import forms
 
-from interface.models import Template, Crawler, CrawlerImg
+from interface.models import Template, Crawler, CrawlerImg, CrawlerImgPath
 from interface.analyzer.analyzer import Analyzer
 
 
@@ -60,13 +60,9 @@ class TemplateForm(forms.models.ModelForm):
                                    content= content, url= url)
 
         for path in img_paths:
-            img = analyzer.search_imgs(path[:])[0]
-            CrawlerImg.objects.create(template= self.instance, xpath= path,
-                                      path= analyzer.download_img(img))
-            # download first img and save as thumbnail in database blob, so for
-            # every possible pictures thumbnail is displayed; only save active
-            # ones
-            #CrawlerImg.objects.create(template= self.instance, url= analyzer.find_img_url(img_url))
+            crawler = CrawlerImgPath.objects.create(template= self.instance, xpath= path)
+            for img in analyzer.search_imgs(path[:]):
+                CrawlerImg.objects.create(img_path_id= crawler.pk, path= analyzer.download_img(img))
 
     def save_active_paths(self, active):
         url = self['url'].value()

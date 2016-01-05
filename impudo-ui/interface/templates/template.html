@@ -30,8 +30,20 @@
       <div class='col-xs-2'><h5>Images to Scrape</h5></div>
       <div class='col-xs-5'></div>
       <div class='col-xs-5'>
-        {% for img in item.crawlerimg_set.all %}
-        <label><input type='checkbox' name='img' value={{ img.id }}><img src={{ img.path }} width="100"/><br></label>
+        {% for path in item.crawlerimgpath_set.all %}
+        <div class='row'>
+          <label>
+            <div class='col-xs-2'>
+              <input type='checkbox' name='img' value={{ path.id }}>
+            </div>
+            <div class='col-xs-10'>
+                {% for img in path.crawlerimg_set.all %}
+                <img src={{ img.path }} width="100"/>
+                {% endfor %}
+            </div>
+            </div>
+          <label>
+        </div>
         {% endfor %}
       </div>
     </div>

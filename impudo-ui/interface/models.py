@@ -43,20 +43,16 @@ class Record(models.Model):
         return str(self.pk)
 
 
-class CrawlerImg(models.Model):
+class CrawlerImgPath(models.Model):
     template = models.ForeignKey(Template, default=None)
     xpath = models.TextField()
-    path = models.CharField(max_length=500)
     active = models.IntegerField(default=0)
 
+class CrawlerImg(models.Model):
+    img_path = models.ForeignKey(CrawlerImgPath, default=None)
+    path = models.CharField(max_length=500)
 
 class Image(models.Model):
-    '''
-    # after: https://docs.djangoproject.com/en/dev/ref/models/fields/#django.db.models.FileField.upload%5Fto
-    # and: http://stackoverflow.com/questions/1190697/django-filefield-with-upload-to-determined-at-runtime
-    def directory_path(self, filename):
-        return 'template_{0}/record_{1}/{2}'.format()
-    '''
     record = models.ForeignKey(Record, default=None)
     path = models.CharField(max_length=500)
 
