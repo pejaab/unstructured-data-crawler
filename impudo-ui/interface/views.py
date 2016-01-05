@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
 from interface.forms import TemplateForm
-from interface.models import Template, Crawler, CrawlerImg
+from interface.models import Template, Crawler, CrawlerImgPath
 from interface.tasks import scrape
 
 NO_SELECTION_ERROR = 'You need to select at least one option'
@@ -23,14 +23,14 @@ def view_template(request, template_id):
                 record.active = 1
                 record.save()
             for img_id in request.POST.getlist('img'):
-                img = CrawlerImg.objects.get(id=int(img_id))
+                img = CrawlerImgPath.objects.get(id=int(img_id))
                 img.active = 1
                 img.save()
             # Only inactive records are kept in database
             active_paths = list(Crawler.objects.filter(template_id=template_id, active=1))
-            active_imgs = list(CrawlerImg.objects.filter(template_id=template_id, active=1))
+            active_imgs = list(CrawlerImgPath.objects.filter(template_id=template_id, active=1))
             Crawler.objects.filter(template_id=template_id).delete()
-            CrawlerImg.objects.filter(template_id=template_id).delete()
+            CrawlerImgPath.objects.filter(template_id=template_id).delete()
             form.save_active_paths(active_paths)
             form.save_active_imgs(active_imgs)
 
@@ -46,10 +46,14 @@ def view_template(request, template_id):
 
             # Delete xpath records before re-searching them
             Crawler.objects.filter(template_id=template_id).delete()
-            CrawlerImg.objects.filter(template_id=template_id).delete()
+            CrawlerImgPath.objects.filter(template_id=template_id).delete()
             item = form.save()
+            #TODO: which exceptions do I need?
+            #try:
             form.analyze()
             return redirect(item)
+            #except:
+                #return render(request, '404.html')
         else:
             return render(request, 'template.html', {'form': form, 'item': item,})
     else:

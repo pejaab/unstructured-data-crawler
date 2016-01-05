@@ -73,7 +73,10 @@ class TemplateForm(forms.models.ModelForm):
                                    content= crawler.content, url= url, active= 1)
 
     def save_active_imgs(self, active):
+        url = self['url'].value()
+        analyzer = Analyzer(url)
         for img in active:
-            CrawlerImg.objects.create(template= self.instance, xpath= img.xpath,
-                                      path= img.path, active= 1)
+            crawler = CrawlerImgPath.objects.create(template= self.instance, xpath= img.xpath, active= 1)
+            for i in analyzer.search_imgs(ast.literal_eval(img.xpath)[:]):
+                CrawlerImg.objects.create(img_path_id= crawler.pk, path= analyzer.download_img(i))
 
