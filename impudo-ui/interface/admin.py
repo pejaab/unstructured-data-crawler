@@ -39,6 +39,9 @@ class RecordAdmin(ExportActionModelAdmin):
 
     resource_class = RecordResource
 
+    class Media:
+        css = {'all': ['admin_tune.css']}
+
 
 class CrawlerInline(admin.TabularInline):
     model = Crawler
@@ -63,6 +66,9 @@ class TemplateAdmin(admin.ModelAdmin):
         for item in queryset:
             scrape.delay(item.id)
     dispatch_crawler.short_description = "Dispatch crawler for this template"
+
+    class Media:
+        css = {'all': ['admin_tune.css']}
 
 admin_site = AdminSite(name='admin')
 admin_site.register(Template, TemplateAdmin)
