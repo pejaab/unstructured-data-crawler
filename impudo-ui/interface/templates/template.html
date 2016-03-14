@@ -37,7 +37,7 @@
             </div>
             <div class='col-xs-10'>
                 {% for img in path.crawlerimg_set.all %}
-                <img src={{ img.path }} width="100"/>
+                {{ img.img | safe }}
                 {% endfor %}
             </div>
           <label>

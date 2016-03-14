@@ -52,6 +52,9 @@ class CrawlerImg(models.Model):
     img_path = models.ForeignKey(CrawlerImgPath, default=None)
     path = models.CharField(max_length=500)
 
+    def img(self):
+        return u'<img src="../../../../media/%s" width="100"/>' % (self.path)
+
 class Image(models.Model):
     record = models.ForeignKey(Record, default=None)
     path = models.CharField(max_length=500)

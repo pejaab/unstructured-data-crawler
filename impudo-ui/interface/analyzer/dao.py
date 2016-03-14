@@ -15,8 +15,8 @@ class Dao(object) :
     #     self.conn = mysql.connector.connect(user='root', passwd='idp2015', host='46.38.236.133', database='impudo')
     #     self.cursor = self.conn.cursor()
 
-    def __init__(self, user=_user, passwd=_passwd, host=_host, db=_db):
-        self.conn = mysql.connector.connect(user=user, passwd=passwd, host=host, database=db)
+    def __init__(self, user=_user, passwd=_passwd, host=_host, db=_db, port=_port):
+        self.conn = mysql.connector.connect(user=user, passwd=passwd, host=host, port=port, database=db)
         self.cursor = self.conn.cursor()
 
     def get_template(self):
