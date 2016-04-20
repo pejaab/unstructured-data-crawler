@@ -49,11 +49,11 @@ def view_template(request, template_id):
             CrawlerImgPath.objects.filter(template_id=template_id).delete()
             item = form.save()
             #TODO: which exceptions do I need?
-            #try:
-            form.analyze()
-            return redirect(item)
-            #except:
-                #return render(request, '404.html')
+            try:
+                form.analyze()
+                return redirect(item)
+            except:
+                return render(request, '404.html')
         else:
             return render(request, 'template.html', {'form': form, 'item': item,})
     else:
