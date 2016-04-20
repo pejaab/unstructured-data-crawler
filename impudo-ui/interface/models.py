@@ -26,7 +26,6 @@ class Crawler(models.Model):
     content = models.TextField()
     url = models.URLField()
     active = models.IntegerField(default=0)
-    crawled = models.CharField(max_length=20, default='False')
 
     def __str__(self):
         return str(self.pk)
