@@ -27,9 +27,9 @@ class Dao(object) :
         sql = 'UPDATE {0} SET xpath="{1}" where id={2}'.format(self._table_template, xpath, id)
         self.execute_sql(sql)
 
-    def insert_record(self, template_id, xpath, content, url, active, crawled):
+    def insert_record(self, template_id, xpath, content, url, active):
         xpath = xpath.replace('\'', '\'\'')
-        sql = "INSERT INTO {0} (template_id, xpath, content, url, active, crawled) VALUES ('{1}', '{2}', {3})".format(self._table_record, template_id, xpath, content, url, active, crawled)
+        sql = "INSERT INTO {0} (template_id, xpath, content, url, active) VALUES ('{1}', '{2}', {3})".format(self._table_record, template_id, xpath, content, url, active)
         self.execute_sql(sql)
 
     def execute_sql(self, sql):
